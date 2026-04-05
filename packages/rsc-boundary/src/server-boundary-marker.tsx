@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
+
 interface RscServerBoundaryMarkerProps {
   children: ReactNode;
   /** Shown in devtools when the region source is explicit. */
@@ -19,7 +21,10 @@ export function RscServerBoundaryMarker({
   className,
 }: RscServerBoundaryMarkerProps) {
   return (
-    <div className={className} data-rsc-boundary-server={label ?? ""}>
+    <div
+      className={className}
+      {...{ [SERVER_BOUNDARY_DATA_ATTR]: label ?? "" }}
+    >
       {children}
     </div>
   );

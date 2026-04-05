@@ -16,6 +16,7 @@
  */
 
 import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
+import { formatHostFallbackLabel } from "./host-label";
 import type { ComponentInfo, ServerRegionInfo } from "./types";
 
 // React fiber work tags (numeric constants from React source)
@@ -321,19 +322,17 @@ function collectExplicitServerRegions(): ServerRegionInfo[] {
 }
 
 function hostFallbackLabel(el: HTMLElement): string {
-  const tag = el.tagName.toLowerCase();
-  if (el.id) return `<${tag}#${el.id}>`;
-  return `<${tag}>`;
+  return formatHostFallbackLabel(el.tagName, el.id);
 }
 
 function heuristicRegionPanelLabel(
   el: HTMLElement,
   allRoots: HTMLElement[],
 ): string {
-  const tag = el.tagName.toLowerCase();
   if (el.id) {
-    return `<${tag}#${el.id}>`;
+    return formatHostFallbackLabel(el.tagName, el.id);
   }
+  const tag = el.tagName.toLowerCase();
   const sameTag = allRoots.filter((e) => e.tagName === el.tagName);
   if (sameTag.length === 1) {
     return `<${tag}>`;

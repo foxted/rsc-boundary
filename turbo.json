@@ -1,6 +1,6 @@
 {
   "$schema": "https://turborepo.dev/schema.json",
-  "ui": "tui",
+  "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_GITHUB_STARS_ENABLED"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -12,6 +12,9 @@
     },
     "check-types": {
       "dependsOn": ["^check-types"]
+    },
+    "test": {
+      "inputs": ["$TURBO_DEFAULT$", "src/**", "vitest.config.ts"]
     },
     "dev": {
       "dependsOn": ["^build"],

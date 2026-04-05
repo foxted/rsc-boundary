@@ -3,10 +3,11 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
-    "dev": "turbo run dev",
+    "dev": "turbo run dev --ui tui",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
     "check-types": "turbo run check-types",
+    "test": "turbo run test",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter=rsc-boundary && changeset publish"

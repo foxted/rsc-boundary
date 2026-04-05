@@ -22,14 +22,21 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "lint": "eslint --max-warnings 0",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "test": "vitest run"
   },
   "publishConfig": {
     "access": "public"
   },
   "peerDependencies": {
+    "next": "^16.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
@@ -37,7 +44,8 @@
     "@types/node": "^25.5.2",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
-    "eslint": "^10.2.0",
-    "typescript": "6.0.2"
+    "eslint": "^9.39.1",
+    "typescript": "6.0.2",
+    "vitest": "^3.2.4"
   }
 }

@@ -13,6 +13,7 @@
  * All styling uses inline styles — no global CSS is injected.
  */
 
+import { formatDevtoolsLabelCaption } from "./highlight-caption";
 import type { ComponentInfo, ServerRegionInfo, ServerRegionSource } from "./types";
 import { COLORS, LABEL_BASE_STYLES, applyStyles } from "./styles";
 
@@ -59,13 +60,7 @@ function createLabel(
   const label = document.createElement("div");
   label.setAttribute(LABEL_ATTR, "");
   label.setAttribute("data-rsc-devtools", "");
-  const prefix =
-    kind === "client"
-      ? "Client"
-      : serverSource === "explicit"
-        ? "Server (explicit)"
-        : "Server (~)";
-  label.textContent = `${prefix}: ${name}`;
+  label.textContent = formatDevtoolsLabelCaption(name, kind, serverSource);
   applyStyles(label, {
     ...LABEL_BASE_STYLES,
     background: kind === "client" ? COLORS.client.label : COLORS.server.label,
