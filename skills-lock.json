@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "conventional-commits": {
+      "source": "foxted/skills",
+      "sourceType": "github",
+      "computedHash": "0840efcfe01af83e43c8dc9fcc4b3dcb00095a8fe812d5fd5faa8bb0eed3b2e0"
+    },
+    "vercel-react-best-practices": {
+      "source": "vercel-labs/agent-skills",
+      "sourceType": "github",
+      "computedHash": "43ca6c197f8ec13055079da7053232d477068b03ca443f9ac1bc819b95cdd432"
+    }
+  }
+}
