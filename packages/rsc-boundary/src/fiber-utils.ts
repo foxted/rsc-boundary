@@ -8,14 +8,15 @@
  *   fibers (FunctionComponent, ForwardRef, MemoComponent, etc.).
  *
  * By walking the fiber tree after hydration, we find every user-defined client
- * component and map it to its root DOM node(s). Everything else in the DOM is
- * server component output.
+ * component and map it to its root DOM node(s). Server regions are explicit
+ * markers plus heuristic DOM outside those client subtrees (see getServerRegions).
  *
  * This approach mirrors what React DevTools does internally — it accesses the
  * __reactFiber$* property that React attaches to DOM elements during hydration.
  */
 
-import type { ComponentInfo } from "./types";
+import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
+import type { ComponentInfo, ServerRegionInfo } from "./types";
 
 // React fiber work tags (numeric constants from React source)
 const FUNCTION_COMPONENT = 0;
@@ -217,8 +218,8 @@ function isInsideDevtools(el: HTMLElement): boolean {
  * Scan the React fiber tree and return all user-defined client components
  * with their root DOM nodes.
  *
- * Server components have no fibers — their DOM regions are identified by
- * exclusion (any DOM node not inside a client component's subtree).
+ * Server regions combine explicit markers with heuristic DOM outside client
+ * subtrees (see getServerRegions).
  */
 export function scanFiberTree(): ComponentInfo[] {
   const root = findFiberRoot();
@@ -247,46 +248,172 @@ export function scanFiberTree(): ComponentInfo[] {
   return components;
 }
 
+function isInsideClientBoundary(
+  el: HTMLElement,
+  clientRoots: ReadonlySet<HTMLElement>,
+): boolean {
+  let current: HTMLElement | null = el;
+  while (current) {
+    if (clientRoots.has(current)) return true;
+    current = current.parentElement;
+  }
+  return false;
+}
+
 /**
- * Collect DOM elements that are server-rendered (not inside any client
- * component's DOM subtree). Operates on direct children of a container
- * (typically document.body or #__next) and returns those that have no
- * overlap with the given client component nodes.
+ * True if `el` is a strict DOM ancestor of any client component root.
+ * Those nodes are excluded from heuristic server highlights so we don't draw
+ * a box around a wrapper that contains a client boundary.
+ */
+function isStrictAncestorOfAnyClientRoot(
+  el: HTMLElement,
+  clientRoots: ReadonlySet<HTMLElement>,
+): boolean {
+  for (const root of clientRoots) {
+    if (el !== root && el.contains(root)) return true;
+  }
+  return false;
+}
+
+/**
+ * True if `el` is the explicit marker element or a descendant of one.
+ */
+function isInsideExplicitMarkerSubtree(
+  el: HTMLElement,
+  explicitRoots: ReadonlySet<HTMLElement>,
+): boolean {
+  let current: HTMLElement | null = el;
+  while (current) {
+    if (explicitRoots.has(current)) return true;
+    current = current.parentElement;
+  }
+  return false;
+}
+
+function* elementDescendants(root: HTMLElement): Generator<HTMLElement> {
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT);
+  let n: Node | null = walker.nextNode();
+  while (n) {
+    if (n instanceof HTMLElement && n !== root) {
+      yield n;
+    }
+    n = walker.nextNode();
+  }
+}
+
+function collectExplicitServerRegions(): ServerRegionInfo[] {
+  const selector = `[${SERVER_BOUNDARY_DATA_ATTR}]`;
+  const regions: ServerRegionInfo[] = [];
+  for (const el of document.querySelectorAll(selector)) {
+    if (!(el instanceof HTMLElement)) continue;
+    if (isInsideDevtools(el)) continue;
+    const raw = el.getAttribute(SERVER_BOUNDARY_DATA_ATTR) ?? "";
+    const name = raw.trim();
+    const displayLabel =
+      name.length > 0 ? name : hostFallbackLabel(el);
+    regions.push({
+      element: el,
+      displayLabel,
+      source: "explicit",
+    });
+  }
+  return regions;
+}
+
+function hostFallbackLabel(el: HTMLElement): string {
+  const tag = el.tagName.toLowerCase();
+  if (el.id) return `<${tag}#${el.id}>`;
+  return `<${tag}>`;
+}
+
+function heuristicRegionPanelLabel(
+  el: HTMLElement,
+  allRoots: HTMLElement[],
+): string {
+  const tag = el.tagName.toLowerCase();
+  if (el.id) {
+    return `<${tag}#${el.id}>`;
+  }
+  const sameTag = allRoots.filter((e) => e.tagName === el.tagName);
+  if (sameTag.length === 1) {
+    return `<${tag}>`;
+  }
+  const n = sameTag.indexOf(el) + 1;
+  return `<${tag}> (${n})`;
+}
+
+/**
+ * Heuristic server regions: DOM nodes outside every client component subtree,
+ * excluding wrappers that strictly contain a client root, and excluding
+ * subtrees already covered by explicit markers.
+ */
+function collectHeuristicServerRegions(
+  clientComponents: ComponentInfo[],
+  explicitMarkerElements: ReadonlySet<HTMLElement>,
+  container: HTMLElement,
+): ServerRegionInfo[] {
+  const clientRoots = new Set<HTMLElement>();
+  for (const comp of clientComponents) {
+    for (const node of comp.domNodes) {
+      clientRoots.add(node);
+    }
+  }
+
+  const inHeuristicCandidate = (el: HTMLElement): boolean => {
+    if (el === container) return false;
+    if (!container.contains(el)) return false;
+    if (isInsideDevtools(el)) return false;
+    if (isInsideClientBoundary(el, clientRoots)) return false;
+    if (isInsideExplicitMarkerSubtree(el, explicitMarkerElements)) return false;
+    return true;
+  };
+
+  const filtered = new Set<HTMLElement>();
+  for (const el of elementDescendants(container)) {
+    if (!inHeuristicCandidate(el)) continue;
+    if (isStrictAncestorOfAnyClientRoot(el, clientRoots)) continue;
+    filtered.add(el);
+  }
+
+  const roots: HTMLElement[] = [];
+  for (const el of filtered) {
+    const parent = el.parentElement;
+    const parentIn =
+      parent !== null &&
+      parent !== container &&
+      filtered.has(parent);
+    if (!parentIn) {
+      roots.push(el);
+    }
+  }
+
+  return roots.map((element) => ({
+    element,
+    displayLabel: heuristicRegionPanelLabel(element, roots),
+    source: "heuristic" as const,
+  }));
+}
+
+/**
+ * Collect server-rendered regions: optional explicit markers plus heuristic
+ * nested regions outside client component DOM subtrees.
  */
 export function getServerRegions(
   clientComponents: ComponentInfo[],
   container?: HTMLElement,
-): HTMLElement[] {
+): ServerRegionInfo[] {
   const root = container ?? document.getElementById("__next") ?? document.body;
 
-  const clientNodeSet = new Set<HTMLElement>();
-  for (const comp of clientComponents) {
-    for (const node of comp.domNodes) {
-      clientNodeSet.add(node);
-    }
-  }
+  const explicit = collectExplicitServerRegions();
+  const explicitRoots = new Set(
+    explicit.map((r) => r.element),
+  );
 
-  const serverRegions: HTMLElement[] = [];
+  const heuristic = collectHeuristicServerRegions(
+    clientComponents,
+    explicitRoots,
+    root,
+  );
 
-  function isInsideClientNode(el: HTMLElement): boolean {
-    let current: HTMLElement | null = el;
-    while (current && current !== root) {
-      if (clientNodeSet.has(current)) return true;
-      current = current.parentElement;
-    }
-    return false;
-  }
-
-  // Walk direct children of the container. If a child is not a client
-  // component root and not inside one, it's server-rendered content.
-  for (const child of Array.from(root.children)) {
-    if (!(child instanceof HTMLElement)) continue;
-    if (clientNodeSet.has(child)) continue;
-    if (isInsideClientNode(child)) continue;
-    // Skip our devtools overlay
-    if (child.dataset.rscDevtools != null) continue;
-    serverRegions.push(child);
-  }
-
-  return serverRegions;
+  return [...explicit, ...heuristic];
 }

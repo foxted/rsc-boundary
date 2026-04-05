@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { CodeBlock } from "../../../components/code-block";
 import { ServerAccordionDemo } from "../../../components/examples/server-accordion-demo";
 import { ServerCounterDemo } from "../../../components/examples/server-counter-demo";
+import { ServerHybridDemo } from "../../../components/examples/server-hybrid-demo";
 import { ServerSearchDemo } from "../../../components/examples/server-search-demo";
 import { ServerStaticBlock } from "../../../components/examples/server-static-block";
 
@@ -63,6 +64,22 @@ export function ServerSearchDemo() {
   );
 }`;
 
+const hybridSnippet = `// components/examples/server-hybrid-demo.tsx
+import { RscServerBoundaryMarker } from "rsc-boundary";
+import { Counter } from "./counter";
+
+export function ServerHybridDemo() {
+  return (
+    <div className="space-y-4">
+      <RscServerBoundaryMarker label="DocsHero">{/* ... */}</RscServerBoundaryMarker>
+      <div className="rounded-xl border ...">
+        <p>Heuristic-only shell</p>
+        <Counter />
+      </div>
+    </div>
+  );
+}`;
+
 export default function DocsExamplesPage() {
   return (
     <article className="max-w-3xl space-y-16">
@@ -78,7 +95,9 @@ export default function DocsExamplesPage() {
           </code>
           ) and partly in <strong className="text-foreground">Client Components</strong>
           . This page route is also a Server Component. Use the RSC devtools to compare
-          blue (server) and orange (client) outlines.
+          blue (server) and orange (client) outlines. Server entries show{" "}
+          <strong className="text-foreground">explicit</strong> vs{" "}
+          <strong className="text-foreground">~</strong> (heuristic) in the panel.
         </p>
       </div>
 
@@ -149,6 +168,25 @@ export default function DocsExamplesPage() {
         <CodeBlock
           code={serverSearchSnippet}
           filename="components/examples/server-search-demo.tsx"
+        />
+      </section>
+
+      <section className="space-y-4">
+        <h2
+          id="hybrid-detection"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          Explicit + heuristic regions
+        </h2>
+        <p className="text-muted">
+          Optional <code className="rounded bg-muted px-1 py-0.5 text-xs">RscServerBoundaryMarker</code>{" "}
+          labels a subtree as an explicit server region; the sibling block below relies
+          on nested heuristic detection only.
+        </p>
+        <ServerHybridDemo />
+        <CodeBlock
+          code={hybridSnippet}
+          filename="components/examples/server-hybrid-demo.tsx"
         />
       </section>
     </article>

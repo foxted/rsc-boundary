@@ -21,7 +21,7 @@ import {
   useRef,
   type CSSProperties,
 } from "react";
-import type { ComponentInfo } from "./types";
+import type { ComponentInfo, ServerRegionInfo } from "./types";
 import { scanFiberTree, getServerRegions } from "./fiber-utils";
 import {
   applyHighlights,
@@ -65,29 +65,27 @@ function componentListEqual(a: ComponentInfo[], b: ComponentInfo[]): boolean {
   return true;
 }
 
-function serverRegionsEqual(a: HTMLElement[], b: HTMLElement[]): boolean {
+function serverRegionsEqual(a: ServerRegionInfo[], b: ServerRegionInfo[]): boolean {
   if (a.length !== b.length) {
     return false;
   }
   for (let i = 0; i < a.length; i++) {
-    if (a[i] !== b[i]) {
+    const ai = a[i];
+    const bi = b[i];
+    if (ai === undefined || bi === undefined) {
+      return false;
+    }
+    if (ai.element !== bi.element) {
+      return false;
+    }
+    if (ai.source !== bi.source) {
+      return false;
+    }
+    if (ai.displayLabel !== bi.displayLabel) {
       return false;
     }
   }
   return true;
-}
-
-function serverRegionLabel(el: HTMLElement, all: HTMLElement[]): string {
-  const tag = el.tagName.toLowerCase();
-  if (el.id) {
-    return `<${tag}#${el.id}>`;
-  }
-  const sameTag = all.filter((e) => e.tagName === el.tagName);
-  if (sameTag.length === 1) {
-    return `<${tag}>`;
-  }
-  const n = sameTag.indexOf(el) + 1;
-  return `<${tag}> (${n})`;
 }
 
 export function RscDevtools() {
@@ -98,7 +96,7 @@ function RscDevtoolsInner() {
   const [active, setActive] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [components, setComponents] = useState<ComponentInfo[]>([]);
-  const [serverRegions, setServerRegions] = useState<HTMLElement[]>([]);
+  const [serverRegions, setServerRegions] = useState<ServerRegionInfo[]>([]);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const scan = useCallback(() => {
@@ -249,7 +247,7 @@ type PanelTab = "client" | "server";
 
 interface PanelProps {
   components: ComponentInfo[];
-  serverRegions: HTMLElement[];
+  serverRegions: ServerRegionInfo[];
 }
 
 function Panel({ components, serverRegions }: PanelProps) {
@@ -307,9 +305,24 @@ function Panel({ components, serverRegions }: PanelProps) {
       </div>
 
       {/* Legend */}
-      <div style={{ display: "flex", gap: 12, marginBottom: 10, fontSize: 11 }}>
-        <LegendItem color={COLORS.server.outline} label="Server" />
-        <LegendItem color={COLORS.client.outline} label="Client" />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 6,
+          marginBottom: 10,
+          fontSize: 11,
+        }}
+      >
+        <div style={{ display: "flex", gap: 12 }}>
+          <LegendItem color={COLORS.server.outline} label="Server" />
+          <LegendItem color={COLORS.client.outline} label="Client" />
+        </div>
+        <div style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, lineHeight: 1.35 }}>
+          Server: <span style={{ color: "rgba(255,255,255,0.65)" }}>explicit</span>{" "}
+          (marker) vs{" "}
+          <span style={{ color: "rgba(255,255,255,0.65)" }}>~</span> (heuristic).
+        </div>
       </div>
 
       {/* Tabs */}
@@ -415,10 +428,10 @@ function Panel({ components, serverRegions }: PanelProps) {
         >
           {serverRegions.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {serverRegions.map((el, i) => (
+              {serverRegions.map((region, i) => (
                 <ServerRegionEntry
                   key={`server-region-${i}`}
-                  label={serverRegionLabel(el, serverRegions)}
+                  region={region}
                 />
               ))}
             </div>
@@ -426,11 +439,11 @@ function Panel({ components, serverRegions }: PanelProps) {
             <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
               {components.length > 0 ? (
                 <>
-                  No top-level server regions (client components may wrap the
-                  page).
+                  No server regions in this view (everything may sit under
+                  client boundaries).
                   <br />
                   <span style={{ color: "rgba(255,255,255,0.35)" }}>
-                    Switch to the client tab for detected client components.
+                    Switch to the client tab or add an explicit server marker.
                   </span>
                 </>
               ) : (
@@ -461,7 +474,9 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-function ServerRegionEntry({ label }: { label: string }) {
+function ServerRegionEntry({ region }: { region: ServerRegionInfo }) {
+  const provenance =
+    region.source === "explicit" ? "explicit" : "~";
   return (
     <div
       style={{
@@ -483,8 +498,29 @@ function ServerRegionEntry({ label }: { label: string }) {
           flexShrink: 0,
         }}
       />
-      <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "ui-monospace, monospace" }}>
-        {label}
+      <span
+        style={{
+          minWidth: 52,
+          flexShrink: 0,
+          fontSize: 9,
+          fontWeight: 600,
+          letterSpacing: "0.02em",
+          textTransform: "uppercase",
+          color:
+            region.source === "explicit"
+              ? "rgba(147, 197, 253, 0.95)"
+              : "rgba(255,255,255,0.45)",
+        }}
+      >
+        {provenance}
+      </span>
+      <span
+        style={{
+          color: "rgba(255,255,255,0.9)",
+          fontFamily: "ui-monospace, monospace",
+        }}
+      >
+        {region.displayLabel}
       </span>
     </div>
   );

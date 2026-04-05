@@ -18,9 +18,9 @@ export default function DocsHowItWorksPage() {
           React Server Components ship HTML and RSC payload; on the client, user{" "}
           <strong className="text-foreground">Client Components</strong> hydrate and
           receive fibers. Server Components do not have a matching client fiber for
-          inspection—so the tool labels generic{" "}
-          <strong className="text-foreground">server regions</strong> by subtracting
-          client-owned DOM from the tree.
+          inspection—so the tool infers{" "}
+          <strong className="text-foreground">server regions</strong> from the DOM,
+          optionally boosted by explicit markers you add.
         </p>
       </div>
 
@@ -46,8 +46,21 @@ export default function DocsHowItWorksPage() {
             nested user boundaries).
           </li>
           <li>
-            Treat remaining top-level regions as server output and draw blue outlines;
-            client boundaries get orange outlines and labels.
+            Collect <strong className="text-foreground">explicit</strong> server regions:
+            elements with <code>data-rsc-boundary-server</code> (e.g. via{" "}
+            <code>RscServerBoundaryMarker</code>).
+          </li>
+          <li>
+            Compute <strong className="text-foreground">heuristic</strong> regions:
+            walk descendants of the app root; nodes outside every client
+            component DOM subtree become candidates, drop wrappers that strictly
+            contain a client root, then take minimal region roots (nested islands,
+            not only top-level siblings).
+          </li>
+          <li>
+            Draw blue outlines for server regions and orange for client boundaries;
+            floating labels include provenance (<strong className="text-foreground">explicit</strong>{" "}
+            vs <strong className="text-foreground">~</strong> heuristic).
           </li>
           <li>
             Attach a debounced <code>MutationObserver</code>{" "}
@@ -71,10 +84,28 @@ export default function DocsHowItWorksPage() {
           </li>
           <li>
             <span className="font-medium text-foreground">Server:</span> dashed blue
-            border; labels are generic (e.g. host tag) because server components have no
-            client fiber name.
+            border. <strong className="text-foreground">Explicit</strong> regions use
+            your marker label; <strong className="text-foreground">heuristic</strong>{" "}
+            regions use host tags / ids because there is no client fiber name.
           </li>
         </ul>
+      </section>
+
+      <section>
+        <h2
+          id="explicit-markers"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          Explicit markers
+        </h2>
+        <p className="mt-4 text-muted">
+          Wrap any server subtree with{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">RscServerBoundaryMarker</code>{" "}
+          or set <code className="rounded bg-muted px-1 py-0.5 text-xs">data-rsc-boundary-server</code>{" "}
+          on your own element. Optional attribute value becomes the panel label.
+          Heuristic scanning skips DOM inside those subtrees so regions are not
+          double-counted.
+        </p>
       </section>
 
       <section>
@@ -94,8 +125,13 @@ export default function DocsHowItWorksPage() {
             framework evolves.
           </li>
           <li>
-            Server region detection is heuristic; deeply nested layouts and portals can
-            produce surprising groupings.
+            Heuristic server regions are inferred from DOM vs client roots; server
+            output rendered <em>inside</em> a client subtree (slots) is still
+            classified as client-owned for highlighting. Use explicit markers where
+            that distinction matters.
+          </li>
+          <li>
+            Portals and non-standard roots can still produce surprising groupings.
           </li>
         </ul>
       </section>

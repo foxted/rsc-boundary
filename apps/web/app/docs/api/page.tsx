@@ -7,7 +7,12 @@ export const metadata: Metadata = {
   description: "RscBoundaryProvider and RscDevtools API for rsc-boundary.",
 };
 
-const importSnippet = `import { RscBoundaryProvider, RscDevtools } from "rsc-boundary";`;
+const importSnippet = `import {
+  RscBoundaryProvider,
+  RscDevtools,
+  RscServerBoundaryMarker,
+  SERVER_BOUNDARY_DATA_ATTR,
+} from "rsc-boundary";`;
 
 const enabledSnippet = `<RscBoundaryProvider enabled>
   {children}
@@ -93,6 +98,27 @@ export default function DocsApiPage() {
         <div className="mt-6 not-prose">
           <CodeBlock code={enabledSnippet} filename="Opt-in for production (docs)" />
         </div>
+      </section>
+
+      <section>
+        <h2
+          id="rsc-server-boundary-marker"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          <code className="text-lg">RscServerBoundaryMarker</code>
+        </h2>
+        <p className="mt-2 text-muted">
+          Server Component. Optional wrapper that sets{" "}
+          <code>{`data-rsc-boundary-server`}</code> so devtools list the subtree as an{" "}
+          <strong className="text-foreground">explicit</strong> server region with your{" "}
+          <code>label</code>. Equivalent to putting the same data attribute on any host
+          element yourself.
+        </p>
+        <p className="mt-3 text-muted">
+          Constant <code className="text-foreground">SERVER_BOUNDARY_DATA_ATTR</code>{" "}
+          is <code className="rounded bg-muted px-1 py-0.5 text-xs">data-rsc-boundary-server</code>{" "}
+          if you need it for docs or codegen.
+        </p>
       </section>
 
       <section>

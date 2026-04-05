@@ -4,17 +4,16 @@
  * When active, this module:
  * 1. Takes the list of client components (from fiber-utils) and applies
  *    orange dashed outlines to their root DOM elements.
- * 2. Identifies server regions (DOM subtrees not inside client components)
- *    and applies blue dashed outlines.
- * 3. Injects small floating labels at each highlighted element showing
- *    the component name and whether it's server or client rendered.
+ * 2. Identifies server regions (explicit markers and/or heuristic DOM outside
+ *    client subtrees) and applies blue dashed outlines.
+ * 3. Injects small floating labels (client name; server label + explicit vs ~).
  * 4. Sets up a MutationObserver to re-scan when the DOM changes
  *    (e.g. route navigation, lazy-loaded content).
  *
  * All styling uses inline styles — no global CSS is injected.
  */
 
-import type { ComponentInfo } from "./types";
+import type { ComponentInfo, ServerRegionInfo, ServerRegionSource } from "./types";
 import { COLORS, LABEL_BASE_STYLES, applyStyles } from "./styles";
 
 const HIGHLIGHT_ATTR = "data-rsc-highlight";
@@ -55,11 +54,18 @@ function withObserverPaused(callback: () => void): void {
 function createLabel(
   name: string,
   kind: "server" | "client",
+  serverSource?: ServerRegionSource,
 ): HTMLElement {
   const label = document.createElement("div");
   label.setAttribute(LABEL_ATTR, "");
   label.setAttribute("data-rsc-devtools", "");
-  label.textContent = `${kind === "client" ? "Client" : "Server"}: ${name}`;
+  const prefix =
+    kind === "client"
+      ? "Client"
+      : serverSource === "explicit"
+        ? "Server (explicit)"
+        : "Server (~)";
+  label.textContent = `${prefix}: ${name}`;
   applyStyles(label, {
     ...LABEL_BASE_STYLES,
     background: kind === "client" ? COLORS.client.label : COLORS.server.label,
@@ -71,6 +77,7 @@ function highlightElement(
   element: HTMLElement,
   name: string,
   kind: "server" | "client",
+  serverSource?: ServerRegionSource,
 ): HighlightEntry {
   const colors = kind === "client" ? COLORS.client : COLORS.server;
 
@@ -86,7 +93,7 @@ function highlightElement(
     element.style.position = "relative";
   }
 
-  const label = createLabel(name, kind);
+  const label = createLabel(name, kind, serverSource);
   element.appendChild(label);
 
   return { element, originalOutline, originalPosition, label };
@@ -97,7 +104,7 @@ function highlightElement(
  */
 export function applyHighlights(
   clientComponents: ComponentInfo[],
-  serverRegions: HTMLElement[],
+  serverRegions: ServerRegionInfo[],
 ): void {
   withObserverPaused(() => {
     removeHighlightsInternal();
@@ -109,8 +116,14 @@ export function applyHighlights(
     }
 
     for (const region of serverRegions) {
-      const tag = region.tagName.toLowerCase();
-      activeHighlights.push(highlightElement(region, tag, "server"));
+      activeHighlights.push(
+        highlightElement(
+          region.element,
+          region.displayLabel,
+          "server",
+          region.source,
+        ),
+      );
     }
   });
 }

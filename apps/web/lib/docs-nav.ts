@@ -27,14 +27,17 @@ export const docsSectionsByPath: Record<string, DocsSection[]> = {
     { id: "counter-island", label: "Server shell + counter" },
     { id: "accordion", label: "Server data + accordion" },
     { id: "server-list-client-filter", label: "Server list + client filter" },
+    { id: "hybrid-detection", label: "Explicit + heuristic regions" },
   ],
   "/docs/api": [
     { id: "rsc-boundary-provider", label: "RscBoundaryProvider" },
+    { id: "rsc-server-boundary-marker", label: "RscServerBoundaryMarker" },
     { id: "rsc-devtools", label: "RscDevtools" },
   ],
   "/docs/how-it-works": [
     { id: "pipeline", label: "Pipeline" },
     { id: "what-you-see", label: "What you see" },
+    { id: "explicit-markers", label: "Explicit markers" },
     { id: "limitations", label: "Limitations" },
   ],
 };

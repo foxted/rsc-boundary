@@ -31,9 +31,9 @@ That's it. No changes needed to any other component.
 A small floating pill appears in the bottom-left corner of your page during development. Click it to toggle boundary highlighting:
 
 - **Orange dashed outlines** around client component subtrees (`"use client"`)
-- **Blue dashed outlines** around server-rendered regions
-- **Labels** on each region showing the component name and render type
-- **Panel** listing all detected components with counts
+- **Blue dashed outlines** around server-rendered regions (heuristic **~** or optional **explicit** markers)
+- **Labels** on each region showing the component name / host tag and provenance
+- **Panel** listing client components and server regions with explicit vs heuristic badges
 
 In production builds, `RscBoundaryProvider` renders only `{children}` — zero runtime cost, no extra DOM nodes, completely tree-shaken.
 
@@ -43,7 +43,7 @@ To force devtools in production (e.g. a documentation site), pass `enabled`:
 <RscBoundaryProvider enabled>{children}</RscBoundaryProvider>
 ```
 
-The package also exports `RscDevtools` for advanced wiring; most apps should rely on the provider only.
+The package also exports `RscDevtools` for advanced wiring, and optional `RscServerBoundaryMarker` / `SERVER_BOUNDARY_DATA_ATTR` for explicit server regions; most apps should rely on the provider only.
 
 ## How it works
 
@@ -54,7 +54,8 @@ When you toggle the devtools on, `rsc-boundary` walks the React fiber tree (via 
 1. Finds every `FunctionComponent`, `ClassComponent`, `ForwardRef`, and `MemoComponent` fiber
 2. Filters out Next.js framework internals (LayoutRouter, ErrorBoundary, etc.)
 3. Maps each remaining user-defined component to its root DOM node(s) — these are your **client component boundaries**
-4. Everything else in the DOM is **server component output**
+4. Collects **explicit** regions: elements with `data-rsc-boundary-server` (e.g. `RscServerBoundaryMarker`)
+5. Derives **heuristic** regions by walking the app root: nodes outside every client subtree, minus wrappers that strictly contain a client root — including **nested** server islands, not only top-level siblings
 
 A `MutationObserver` watches for DOM changes (route navigation, lazy loading) and re-scans automatically.
 
@@ -62,19 +63,22 @@ A `MutationObserver` watches for DOM changes (route navigation, lazy loading) an
 
 ```
 packages/rsc-boundary/src/
-├── index.ts          # Public API: RscBoundaryProvider, RscDevtools
-├── provider.tsx      # Server component — renders children + <RscDevtools /> in dev
-├── devtools.tsx      # "use client" — floating toggle pill + legend panel
-├── fiber-utils.ts    # React fiber tree walking + component detection
-├── highlight.ts      # DOM outline/label application + MutationObserver
-├── styles.ts         # CSS-in-JS constants (no external CSS deps)
-└── types.ts          # Shared interfaces
+├── index.ts                  # Public API
+├── constants.ts              # data attribute name for explicit markers
+├── provider.tsx              # Server component — children + <RscDevtools /> in dev
+├── server-boundary-marker.tsx # Optional explicit server region wrapper
+├── devtools.tsx              # "use client" — pill, panel, scan trigger
+├── fiber-utils.ts            # Fiber walk + server region detection
+├── highlight.ts              # Outlines, labels, MutationObserver
+├── styles.ts
+└── types.ts
 ```
 
 ## Limitations
 
 - **Uses React internals** (`__reactFiber$*`): same approach React DevTools uses. Dev-only, so stability risk is low.
-- **Cannot name server components**: since they have no fibers, their DOM regions are labeled generically ("Server: div"). A future build-time transform could add named markers.
+- **Heuristic server names**: regions outside client subtrees are labeled by host tag / id unless you add `data-rsc-boundary-server` or `RscServerBoundaryMarker` for an explicit label.
+- **Slots inside client trees**: DOM passed as children into a client component is still under that client root for highlighting; use explicit markers if you need a named server region there.
 - **Next.js internal filtering**: maintains a list of known Next.js internal component names to exclude. May need updates when Next.js adds or renames internals.
 
 ## Requirements
