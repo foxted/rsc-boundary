@@ -3,6 +3,10 @@
   "version": "0.0.1",
   "type": "module",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/foxted/rsc-boundary.git"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
