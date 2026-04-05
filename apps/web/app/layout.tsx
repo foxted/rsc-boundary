@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { RscBoundaryProvider } from "rsc-boundary";
 import { Footer } from "../components/footer";
 import { Header } from "../components/header";
 import "./globals.css";
@@ -34,11 +33,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col font-sans antialiased`}
       >
-        <RscBoundaryProvider enabled>
-          <Header />
-          <div className="flex-1">{children}</div>
-          <Footer />
-        </RscBoundaryProvider>
+        <Header />
+        <div className="flex-1">{children}</div>
+        <Footer />
       </body>
     </html>
   );

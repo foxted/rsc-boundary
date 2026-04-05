@@ -33,6 +33,16 @@ export default function DocsGettingStartedPage() {
         create client fibers, so the tool approximates server regions by
         exclusion.
       </p>
+      <aside className="mt-6 rounded-lg border border-border bg-card p-4 text-sm text-muted">
+        <p>
+          <strong className="text-foreground">Try it on these pages.</strong>{" "}
+          RSC Boundary is available on every page in this documentation
+          section. Use the <strong className="text-foreground">RSC</strong>{" "}
+          control in the bottom-left corner to turn on boundary highlights and
+          open the component list—you can see the tool in action while you
+          read.
+        </p>
+      </aside>
 
       <h2
         id="prerequisites"
@@ -82,9 +92,14 @@ export default function DocsGettingStartedPage() {
       </h2>
       <ol className="mt-3 list-inside list-decimal space-y-2 text-muted">
         <li>
-          Run <code>next dev</code>.
+          On this site, stay on a documentation page and click the{" "}
+          <strong className="text-foreground">RSC</strong> pill (bottom-left) to
+          activate the tool—no local setup required.
         </li>
-        <li>Open any route and click the RSC pill (bottom-left).</li>
+        <li>
+          In your own project, run <code>next dev</code> with the provider in
+          your root layout, open any route, and use the same pill.
+        </li>
         <li>
           Orange dashed outlines mark client subtrees; blue marks
           server-rendered regions. Click the number in the pill to open the
