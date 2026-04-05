@@ -30,6 +30,28 @@ interface HighlightEntry {
 let activeHighlights: HighlightEntry[] = [];
 let observer: MutationObserver | null = null;
 
+const OBSERVER_OPTIONS: MutationObserverInit = {
+  childList: true,
+  subtree: true,
+};
+
+/**
+ * Our own highlight/label DOM updates trigger childList mutations. Pause the
+ * observer while mutating so we don't debounce-scan → setState in a loop.
+ */
+function withObserverPaused(callback: () => void): void {
+  if (!observer) {
+    callback();
+    return;
+  }
+  observer.disconnect();
+  try {
+    callback();
+  } finally {
+    observer.observe(document.body, OBSERVER_OPTIONS);
+  }
+}
+
 function createLabel(
   name: string,
   kind: "server" | "client",
@@ -77,24 +99,23 @@ export function applyHighlights(
   clientComponents: ComponentInfo[],
   serverRegions: HTMLElement[],
 ): void {
-  removeHighlights();
+  withObserverPaused(() => {
+    removeHighlightsInternal();
 
-  for (const comp of clientComponents) {
-    for (const node of comp.domNodes) {
-      activeHighlights.push(highlightElement(node, comp.name, "client"));
+    for (const comp of clientComponents) {
+      for (const node of comp.domNodes) {
+        activeHighlights.push(highlightElement(node, comp.name, "client"));
+      }
     }
-  }
 
-  for (const region of serverRegions) {
-    const tag = region.tagName.toLowerCase();
-    activeHighlights.push(highlightElement(region, tag, "server"));
-  }
+    for (const region of serverRegions) {
+      const tag = region.tagName.toLowerCase();
+      activeHighlights.push(highlightElement(region, tag, "server"));
+    }
+  });
 }
 
-/**
- * Remove all active highlights and restore original styles.
- */
-export function removeHighlights(): void {
+function removeHighlightsInternal(): void {
   for (const entry of activeHighlights) {
     entry.element.style.outline = entry.originalOutline;
     entry.element.style.position = entry.originalPosition;
@@ -102,6 +123,13 @@ export function removeHighlights(): void {
     entry.label.remove();
   }
   activeHighlights = [];
+}
+
+/**
+ * Remove all active highlights and restore original styles.
+ */
+export function removeHighlights(): void {
+  withObserverPaused(removeHighlightsInternal);
 }
 
 /**
@@ -121,10 +149,7 @@ export function observeDomChanges(onMutation: () => void): () => void {
     debounceTimer = setTimeout(onMutation, 300);
   });
 
-  observer.observe(document.body, {
-    childList: true,
-    subtree: true,
-  });
+  observer.observe(document.body, OBSERVER_OPTIONS);
 
   return () => {
     if (debounceTimer) clearTimeout(debounceTimer);

@@ -37,6 +37,14 @@ A small floating pill appears in the bottom-left corner of your page during deve
 
 In production builds, `RscBoundaryProvider` renders only `{children}` — zero runtime cost, no extra DOM nodes, completely tree-shaken.
 
+To force devtools in production (e.g. a documentation site), pass `enabled`:
+
+```tsx
+<RscBoundaryProvider enabled>{children}</RscBoundaryProvider>
+```
+
+The package also exports `RscDevtools` for advanced wiring; most apps should rely on the provider only.
+
 ## How it works
 
 React Server Components are resolved on the server and sent to the client as pre-rendered HTML. They have **no fibers** in the client-side React tree. Client Components are hydrated and **do** have fibers.
@@ -54,7 +62,7 @@ A `MutationObserver` watches for DOM changes (route navigation, lazy loading) an
 
 ```
 packages/rsc-boundary/src/
-├── index.ts          # Public API: exports RscBoundaryProvider
+├── index.ts          # Public API: RscBoundaryProvider, RscDevtools
 ├── provider.tsx      # Server component — renders children + <RscDevtools /> in dev
 ├── devtools.tsx      # "use client" — floating toggle pill + legend panel
 ├── fiber-utils.ts    # React fiber tree walking + component detection
@@ -71,5 +79,5 @@ packages/rsc-boundary/src/
 
 ## Requirements
 
-- Next.js 14+ (App Router)
+- Next.js 16+ (App Router)
 - React 19+

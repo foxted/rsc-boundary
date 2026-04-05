@@ -49,7 +49,7 @@ export const PILL_ACTIVE_STYLES: Partial<typeof PILL_STYLES> = {
 
 export const PANEL_STYLES: Record<string, string> = {
   position: "fixed",
-  bottom: "52px",
+  bottom: "100px",
   left: "16px",
   zIndex: "99998",
   width: "280px",

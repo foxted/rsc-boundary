@@ -10,11 +10,17 @@
  *
  * A companion panel lists detected components with counts and a legend.
  *
- * This component is client-only ("use client") and renders nothing in
- * production builds.
+ * This component is client-only ("use client"). Mounting is controlled by
+ * `RscBoundaryProvider` (development by default, or when `enabled` is set).
  */
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import {
+  useState,
+  useCallback,
+  useEffect,
+  useRef,
+  type CSSProperties,
+} from "react";
 import type { ComponentInfo } from "./types";
 import { scanFiberTree, getServerRegions } from "./fiber-utils";
 import {
@@ -30,11 +36,61 @@ import {
   applyStyles,
 } from "./styles";
 
-export function RscDevtools() {
-  if (process.env.NODE_ENV !== "development") {
-    return null;
+function componentListEqual(a: ComponentInfo[], b: ComponentInfo[]): boolean {
+  if (a.length !== b.length) {
+    return false;
   }
+  for (let i = 0; i < a.length; i++) {
+    const ai = a[i];
+    const bi = b[i];
+    if (ai === undefined || bi === undefined) {
+      return false;
+    }
+    if (ai.name !== bi.name) {
+      return false;
+    }
+    const na = ai.domNodes;
+    const nb = bi.domNodes;
+    if (na.length !== nb.length) {
+      return false;
+    }
+    for (let j = 0; j < na.length; j++) {
+      const naJ = na[j];
+      const nbJ = nb[j];
+      if (naJ !== nbJ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
 
+function serverRegionsEqual(a: HTMLElement[], b: HTMLElement[]): boolean {
+  if (a.length !== b.length) {
+    return false;
+  }
+  for (let i = 0; i < a.length; i++) {
+    if (a[i] !== b[i]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function serverRegionLabel(el: HTMLElement, all: HTMLElement[]): string {
+  const tag = el.tagName.toLowerCase();
+  if (el.id) {
+    return `<${tag}#${el.id}>`;
+  }
+  const sameTag = all.filter((e) => e.tagName === el.tagName);
+  if (sameTag.length === 1) {
+    return `<${tag}>`;
+  }
+  const n = sameTag.indexOf(el) + 1;
+  return `<${tag}> (${n})`;
+}
+
+export function RscDevtools() {
   return <RscDevtoolsInner />;
 }
 
@@ -42,15 +98,19 @@ function RscDevtoolsInner() {
   const [active, setActive] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [components, setComponents] = useState<ComponentInfo[]>([]);
-  const [serverCount, setServerCount] = useState(0);
+  const [serverRegions, setServerRegions] = useState<HTMLElement[]>([]);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const scan = useCallback(() => {
     const clientComponents = scanFiberTree();
-    const serverRegions = getServerRegions(clientComponents);
-    setComponents(clientComponents);
-    setServerCount(serverRegions.length);
-    applyHighlights(clientComponents, serverRegions);
+    const nextServerRegions = getServerRegions(clientComponents);
+    applyHighlights(clientComponents, nextServerRegions);
+    setComponents((prev) =>
+      componentListEqual(prev, clientComponents) ? prev : clientComponents,
+    );
+    setServerRegions((prev) =>
+      serverRegionsEqual(prev, nextServerRegions) ? prev : nextServerRegions,
+    );
   }, []);
 
   const activate = useCallback(() => {
@@ -66,7 +126,7 @@ function RscDevtoolsInner() {
     cleanupRef.current?.();
     cleanupRef.current = null;
     setComponents([]);
-    setServerCount(0);
+    setServerRegions([]);
   }, []);
 
   const handleToggle = useCallback(() => {
@@ -102,7 +162,7 @@ function RscDevtoolsInner() {
   return (
     <>
       {panelOpen && active && (
-        <Panel components={components} serverCount={serverCount} />
+        <Panel components={components} serverRegions={serverRegions} />
       )}
       <Pill
         active={active}
@@ -185,18 +245,52 @@ function Pill({ active, onToggle, onPanelToggle, clientCount }: PillProps) {
   );
 }
 
+type PanelTab = "client" | "server";
+
 interface PanelProps {
   components: ComponentInfo[];
-  serverCount: number;
+  serverRegions: HTMLElement[];
 }
 
-function Panel({ components, serverCount }: PanelProps) {
+function Panel({ components, serverRegions }: PanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const [tab, setTab] = useState<PanelTab>("client");
 
   useEffect(() => {
     if (!panelRef.current) return;
     applyStyles(panelRef.current, PANEL_STYLES);
   }, []);
+
+  const tabBase: CSSProperties = {
+    flex: 1,
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 2,
+    minHeight: 44,
+    padding: "6px 6px 8px",
+    border: "none",
+    borderRadius: "4px 4px 0 0",
+    background: "transparent",
+    cursor: "pointer",
+    fontFamily: "inherit",
+  };
+
+  const tabLine1: CSSProperties = {
+    fontSize: 14,
+    fontWeight: 600,
+    lineHeight: 1.15,
+    fontVariantNumeric: "tabular-nums",
+  };
+
+  const tabLine2: CSSProperties = {
+    fontSize: 10,
+    fontWeight: 500,
+    lineHeight: 1.2,
+    textAlign: "center",
+    whiteSpace: "nowrap",
+  };
 
   return (
     <div ref={panelRef} data-rsc-devtools="">
@@ -218,38 +312,132 @@ function Panel({ components, serverCount }: PanelProps) {
         <LegendItem color={COLORS.client.outline} label="Client" />
       </div>
 
-      {/* Counts */}
+      {/* Tabs */}
       <div
+        role="tablist"
+        aria-label="Boundary list scope"
         style={{
           display: "flex",
-          gap: 12,
+          gap: 0,
           marginBottom: 10,
-          fontSize: 11,
-          color: "rgba(255,255,255,0.6)",
+          borderBottom: "1px solid rgba(255,255,255,0.12)",
         }}
       >
-        <span>
-          {serverCount} server region{serverCount !== 1 ? "s" : ""}
-        </span>
-        <span>
-          {components.length} client component{components.length !== 1 ? "s" : ""}
-        </span>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "client"}
+          id="rsc-panel-tab-client"
+          aria-controls="rsc-panel-client"
+          aria-label={`${components.length} client component${components.length !== 1 ? "s" : ""}`}
+          onClick={() => setTab("client")}
+          style={{
+            ...tabBase,
+            color:
+              tab === "client"
+                ? "rgba(255,255,255,0.95)"
+                : "rgba(255,255,255,0.55)",
+            borderBottom:
+              tab === "client"
+                ? `2px solid ${COLORS.client.outline}`
+                : "2px solid transparent",
+            marginBottom: -1,
+          }}
+        >
+          <span style={tabLine1}>{components.length}</span>
+          <span style={tabLine2}>
+            client component{components.length !== 1 ? "s" : ""}
+          </span>
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={tab === "server"}
+          id="rsc-panel-tab-server"
+          aria-controls="rsc-panel-server"
+          aria-label={`${serverRegions.length} server region${serverRegions.length !== 1 ? "s" : ""}`}
+          onClick={() => setTab("server")}
+          style={{
+            ...tabBase,
+            color:
+              tab === "server"
+                ? "rgba(255,255,255,0.95)"
+                : "rgba(255,255,255,0.55)",
+            borderBottom:
+              tab === "server"
+                ? `2px solid ${COLORS.server.outline}`
+                : "2px solid transparent",
+            marginBottom: -1,
+          }}
+        >
+          <span style={tabLine1}>{serverRegions.length}</span>
+          <span style={tabLine2}>
+            server region{serverRegions.length !== 1 ? "s" : ""}
+          </span>
+        </button>
       </div>
 
-      {/* Component list */}
-      {components.length > 0 && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-          {components.map((comp, i) => (
-            <ComponentEntry key={`${comp.name}-${i}`} component={comp} />
-          ))}
+      {tab === "client" && (
+        <div
+          id="rsc-panel-client"
+          role="tabpanel"
+          aria-labelledby="rsc-panel-tab-client"
+        >
+          {components.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {components.map((comp, i) => (
+                <ComponentEntry key={`${comp.name}-${i}`} component={comp} />
+              ))}
+            </div>
+          ) : (
+            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
+              {serverRegions.length > 0 ? (
+                <>
+                  No client components in this view.
+                  <br />
+                  <span style={{ color: "rgba(255,255,255,0.35)" }}>
+                    Switch to the server tab to see server regions.
+                  </span>
+                </>
+              ) : (
+                "No regions detected."
+              )}
+            </div>
+          )}
         </div>
       )}
 
-      {components.length === 0 && (
-        <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
-          No client components detected.
-          <br />
-          All content is server-rendered.
+      {tab === "server" && (
+        <div
+          id="rsc-panel-server"
+          role="tabpanel"
+          aria-labelledby="rsc-panel-tab-server"
+        >
+          {serverRegions.length > 0 ? (
+            <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+              {serverRegions.map((el, i) => (
+                <ServerRegionEntry
+                  key={`server-region-${i}`}
+                  label={serverRegionLabel(el, serverRegions)}
+                />
+              ))}
+            </div>
+          ) : (
+            <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
+              {components.length > 0 ? (
+                <>
+                  No top-level server regions (client components may wrap the
+                  page).
+                  <br />
+                  <span style={{ color: "rgba(255,255,255,0.35)" }}>
+                    Switch to the client tab for detected client components.
+                  </span>
+                </>
+              ) : (
+                "No regions detected."
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -270,6 +458,35 @@ function LegendItem({ color, label }: { color: string; label: string }) {
       />
       {label}
     </span>
+  );
+}
+
+function ServerRegionEntry({ label }: { label: string }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 6,
+        padding: "3px 6px",
+        borderRadius: 4,
+        background: "rgba(59, 130, 246, 0.12)",
+        fontSize: 11,
+      }}
+    >
+      <span
+        style={{
+          width: 6,
+          height: 6,
+          borderRadius: "50%",
+          background: COLORS.server.outline,
+          flexShrink: 0,
+        }}
+      />
+      <span style={{ color: "rgba(255,255,255,0.9)", fontFamily: "ui-monospace, monospace" }}>
+        {label}
+      </span>
+    </div>
   );
 }
 
