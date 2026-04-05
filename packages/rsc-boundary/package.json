@@ -2,13 +2,22 @@
   "name": "rsc-boundary",
   "version": "0.0.1",
   "type": "module",
-  "private": true,
+  "license": "MIT",
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
   },
+  "types": "./dist/index.d.ts",
+  "files": ["dist", "README.md", "LICENSE"],
   "scripts": {
+    "build": "tsc -p tsconfig.build.json",
     "lint": "eslint --max-warnings 0",
     "check-types": "tsc --noEmit"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "peerDependencies": {
     "react": "^19.0.0",
