@@ -11,7 +11,7 @@
       "dependsOn": ["^lint"]
     },
     "check-types": {
-      "dependsOn": ["^check-types"]
+      "dependsOn": ["^check-types", "^build"]
     },
     "test": {
       "inputs": ["$TURBO_DEFAULT$", "src/**", "vitest.config.ts"]
