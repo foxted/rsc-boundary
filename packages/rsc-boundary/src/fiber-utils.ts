@@ -1,5 +1,5 @@
 /**
- * React fiber tree utilities for automatic RSC boundary detection.
+ * React fiber tree utilities for automatic RSC Boundary detection.
  *
  * How it works:
  * - React Server Components are resolved on the server and sent as pre-rendered

@@ -1,5 +1,5 @@
 /**
- * DOM highlighting for RSC boundary visualization.
+ * DOM highlighting for RSC Boundary visualization.
  *
  * When active, this module:
  * 1. Takes the list of client components (from fiber-utils) and applies

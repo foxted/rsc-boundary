@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "How it works",
   description:
-    "How rsc-boundary detects client boundaries and approximates server regions.",
+    "How RSC Boundary detects client boundaries and approximates server regions.",
 };
 
 export default function DocsHowItWorksPage() {

@@ -1,4 +1,4 @@
-# rsc-boundary
+# RSC Boundary
 
 Visualize the boundary between React Server Components and Client Components in Next.js (App Router). Wrap your root layout with a single provider and get automatic, zero-config highlighting of every client component boundary in your app.
 
@@ -13,7 +13,11 @@ In your root layout:
 ```tsx
 import { RscBoundaryProvider } from "rsc-boundary";
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en">
       <body>
@@ -49,7 +53,7 @@ The package also exports `RscDevtools` for advanced wiring, and optional `RscSer
 
 React Server Components are resolved on the server and sent to the client as pre-rendered HTML. They have **no fibers** in the client-side React tree. Client Components are hydrated and **do** have fibers.
 
-When you toggle the devtools on, `rsc-boundary` walks the React fiber tree (via the `__reactFiber$*` property that React attaches to DOM elements) and:
+When you toggle the devtools on, RSC Boundary walks the React fiber tree (via the `__reactFiber$*` property that React attaches to DOM elements) and:
 
 1. Finds every `FunctionComponent`, `ClassComponent`, `ForwardRef`, and `MemoComponent` fiber
 2. Filters out Next.js framework internals (LayoutRouter, ErrorBoundary, etc.)

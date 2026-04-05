@@ -1,5 +1,5 @@
 /**
- * RscBoundaryProvider — the single integration point for rsc-boundary.
+ * RscBoundaryProvider — the single integration point for RSC Boundary.
  *
  * This is a React Server Component (no "use client" directive). Add it once
  * in your root layout:

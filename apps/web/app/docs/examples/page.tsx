@@ -9,7 +9,7 @@ import { ServerStaticBlock } from "../../../components/examples/server-static-bl
 export const metadata: Metadata = {
   title: "Examples",
   description:
-    "Interactive examples mixing Server and Client Components for rsc-boundary.",
+    "Interactive examples mixing Server and Client Components for RSC Boundary.",
 };
 
 const staticBlockSnippet = `// components/examples/server-static-block.tsx

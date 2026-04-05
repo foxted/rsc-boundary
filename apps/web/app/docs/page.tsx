@@ -5,7 +5,7 @@ import { PackageInstall } from "../../components/package-install";
 export const metadata: Metadata = {
   title: "Getting started",
   description:
-    "Install rsc-boundary and add RscBoundaryProvider to your root layout.",
+    "Get started with RSC Boundary: install the rsc-boundary package and add RscBoundaryProvider to your root layout.",
 };
 
 const layoutSnippet = `import { RscBoundaryProvider } from "rsc-boundary";

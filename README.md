@@ -1,157 +1,59 @@
-# Turborepo starter
+# RSC Boundary
 
-This Turborepo starter is maintained by the Turborepo core team.
+Monorepo for **RSC Boundary**: devtools that visualize the boundary between **React Server Components** and **Client Components** in Next.js (App Router). Add a single provider to your root layout and get in-browser outlines, labels, and a panel that map server vs client regions—without touching individual components.
 
-## Using this example
+The published library lives under [`packages/rsc-boundary`](packages/rsc-boundary). The demo site, docs snippets, and playground live under [`apps/web`](apps/web).
 
-Run the following command:
+![RSC Boundary devtools on the demo site: blue outlines for server regions, orange for client components](apps/web/public/screenshot.png)
 
-```sh
-npx create-turbo@latest
+## Install in your Next.js app
+
+Requirements: **Next.js 16+** (App Router), **React 19+**.
+
+Install the npm package (name is `rsc-boundary`):
+
+```bash
+pnpm add rsc-boundary
+# or: npm install rsc-boundary
+# or: yarn add rsc-boundary
 ```
 
-## What's inside?
+In your **root** `app/layout.tsx` (or `src/app/layout.tsx`), wrap `children` with `RscBoundaryProvider`:
 
-This Turborepo includes the following packages/apps:
+```tsx
+import { RscBoundaryProvider } from "rsc-boundary";
 
-### Apps and Packages
-
-- `web`: [Next.js](https://nextjs.org/) app (landing and playground)
-- `config/eslint-config` (`@repo/eslint-config`): ESLint presets (includes `eslint-config-next` and `eslint-config-prettier`)
-- `config/typescript-config` (`@repo/typescript-config`): shared `tsconfig.json` files
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo build
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>
+        <RscBoundaryProvider>{children}</RscBoundaryProvider>
+      </body>
+    </html>
+  );
+}
 ```
 
-Without global `turbo`, use your package manager:
+You do not need to change any other components. In development, a small control appears so you can toggle server/client boundary highlights. In production builds the provider renders only `children` (no extra cost); pass `enabled` if you need devtools on a deployed site (for example this repo’s demo).
 
-```sh
-cd my-turborepo
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+More detail—behavior, optional APIs, architecture, and limitations—is in **[`packages/rsc-boundary/README.md`](packages/rsc-boundary/README.md)**.
+
+To work on this repository (layout, local dev, where to put changes), see **[`CONTRIBUTING.md`](CONTRIBUTING.md)** and [`AGENTS.md`](AGENTS.md).
+
+## Releases
+
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets). From the repo root:
+
+```bash
+pnpm changeset        # describe changes
+pnpm version-packages # bump versions from changesets
+pnpm release          # build package and publish (maintainers)
 ```
 
-You can build a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
+## License
 
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo build --filter=docs
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
-```
-
-### Develop
-
-To develop all apps and packages, run the following command:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo dev
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters):
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo dev --filter=web
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed (recommended):
-
-```sh
-cd my-turborepo
-turbo login
-```
-
-Without global `turbo`, use your package manager:
-
-```sh
-cd my-turborepo
-npx turbo login
-yarn exec turbo login
-pnpm exec turbo login
-```
-
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
-
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
-With [global `turbo`](https://turborepo.dev/docs/getting-started/installation#global-installation) installed:
-
-```sh
-turbo link
-```
-
-Without global `turbo`:
-
-```sh
-npx turbo link
-yarn exec turbo link
-pnpm exec turbo link
-```
-
-## Useful Links
-
-Learn more about the power of Turborepo:
-
-- [Tasks](https://turborepo.dev/docs/crafting-your-repository/running-tasks)
-- [Caching](https://turborepo.dev/docs/crafting-your-repository/caching)
-- [Remote Caching](https://turborepo.dev/docs/core-concepts/remote-caching)
-- [Filtering](https://turborepo.dev/docs/crafting-your-repository/running-tasks#using-filters)
-- [Configuration Options](https://turborepo.dev/docs/reference/configuration)
-- [CLI Usage](https://turborepo.dev/docs/reference/command-line-reference)
+See [LICENSE](LICENSE). The `rsc-boundary` package includes its own [LICENSE](packages/rsc-boundary/LICENSE).

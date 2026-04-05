@@ -4,7 +4,7 @@ import { CodeBlock } from "../../../components/code-block";
 
 export const metadata: Metadata = {
   title: "API reference",
-  description: "RscBoundaryProvider and RscDevtools API for rsc-boundary.",
+  description: "RscBoundaryProvider and RscDevtools API for RSC Boundary.",
 };
 
 const importSnippet = `import {

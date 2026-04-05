@@ -1,6 +1,6 @@
 # web
 
-Documentation and demo site for **rsc-boundary**, built with Next.js App Router.
+Documentation and demo site for **RSC Boundary**, built with Next.js App Router.
 
 ## Scripts
 
@@ -18,4 +18,4 @@ pnpm dev
 pnpm build
 ```
 
-The root layout wraps the app with `RscBoundaryProvider enabled` so the RSC boundary devtools work in production on this site.
+The root layout wraps the app with `RscBoundaryProvider enabled` so RSC Boundary devtools work in production on this site.

@@ -200,8 +200,8 @@ function Pill({ active, onToggle, onPanelToggle, clientCount }: PillProps) {
       type="button"
       onClick={onToggle}
       data-rsc-devtools=""
-      aria-label="Toggle RSC boundary highlighting"
-      title="Toggle RSC boundary highlighting"
+      aria-label="Toggle RSC Boundary highlighting"
+      title="Toggle RSC Boundary highlighting"
     >
       <span
         style={{

@@ -1,6 +1,6 @@
 /**
  * Pure Server Component — no "use client", no client children.
- * In rsc-boundary devtools this subtree highlights as server-only (blue).
+ * In RSC Boundary devtools this subtree highlights as server-only (blue).
  */
 export function ServerStaticBlock() {
   return (

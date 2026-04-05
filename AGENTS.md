@@ -1,18 +1,18 @@
-# AGENTS.md — rsc-boundary
+# AGENTS.md — RSC Boundary
 
 Guidance for AI and human contributors. Keep changes scoped and consistent with this layout.
 
 ## Purpose
 
-Monorepo for **rsc-boundary**: tooling that visualizes the boundary between **React Server Components** and **Client Components** in Next.js (App Router). The **library** lives under `packages/`; the **demo site and playground** live under `apps/web`.
+Monorepo for **RSC Boundary**: tooling that visualizes the boundary between **React Server Components** and **Client Components** in Next.js (App Router). The **library** lives under `packages/`; the **demo site and playground** live under `apps/web`.
 
 ## Layout
 
-| Path | Role |
-|------|------|
-| `packages/rsc-boundary` | Published (or publishable) package: APIs, runtime/dev-only behavior, types. Minimize coupling to the demo app. |
-| `apps/web` | Next.js app: marketing, docs snippets, interactive examples. Depends on `rsc-boundary` via `workspace:*`. |
-| `config/eslint-config`, `config/typescript-config` | Shared ESLint and TypeScript configs (`@repo/eslint-config`, `@repo/typescript-config`). |
+| Path                                               | Role                                                                                                           |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `packages/rsc-boundary`                            | Published (or publishable) package: APIs, runtime/dev-only behavior, types. Minimize coupling to the demo app. |
+| `apps/web`                                         | Next.js app: marketing, docs snippets, interactive examples. Depends on `rsc-boundary` via `workspace:*`.      |
+| `config/eslint-config`, `config/typescript-config` | Shared ESLint and TypeScript configs (`@repo/eslint-config`, `@repo/typescript-config`).                       |
 
 **Rule of thumb:** feature work for “how boundaries are detected/highlighted” belongs in `packages/rsc-boundary`. Wiring, copy, and example routes belong in `apps/web`.
 
