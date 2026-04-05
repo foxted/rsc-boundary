@@ -1,20 +1,18 @@
 {
-  "name": "web",
-  "version": "0.1.0",
+  "name": "rsc-boundary",
+  "version": "0.0.1",
   "type": "module",
   "private": true,
-  "scripts": {
-    "dev": "next dev --port 3000",
-    "build": "next build",
-    "start": "next start",
-    "lint": "eslint --max-warnings 0",
-    "check-types": "next typegen && tsc --noEmit"
+  "exports": {
+    ".": "./src/index.ts"
   },
-  "dependencies": {
-    "next": "16.2.2",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4",
-    "rsc-boundary": "workspace:*"
+  "scripts": {
+    "lint": "eslint --max-warnings 0",
+    "check-types": "tsc --noEmit"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
