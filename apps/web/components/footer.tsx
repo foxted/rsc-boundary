@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GitHubRepoLink } from "./github-repo-link";
 
 export function Footer() {
   return (
@@ -16,6 +17,7 @@ export function Footer() {
           <Link href="/docs/examples" className="text-muted hover:text-foreground">
             Examples
           </Link>
+          <GitHubRepoLink location="footer" />
         </div>
       </div>
     </footer>

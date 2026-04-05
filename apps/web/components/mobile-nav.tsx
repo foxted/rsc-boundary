@@ -1,5 +1,6 @@
 "use client";
 
+import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useState } from "react";
 
@@ -25,7 +26,11 @@ export function MobileNav() {
         aria-controls="mobile-nav-panel"
         aria-label={open ? "Close menu" : "Open menu"}
       >
-        {open ? <CloseIcon /> : <MenuIcon />}
+        {open ? (
+          <X aria-hidden className="h-5 w-5" />
+        ) : (
+          <Menu aria-hidden className="h-5 w-5" />
+        )}
       </button>
       {open ? (
         <div
@@ -47,31 +52,5 @@ export function MobileNav() {
         </div>
       ) : null}
     </div>
-  );
-}
-
-function MenuIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M4 6h16M4 12h16M4 18h16"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M6 6l12 12M18 6L6 18"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

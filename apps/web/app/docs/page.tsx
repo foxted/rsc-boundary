@@ -87,7 +87,7 @@ export default function DocsGettingStartedPage() {
         <li>Open any route and click the RSC pill (bottom-left).</li>
         <li>
           Orange dashed outlines mark client subtrees; blue marks
-          server-rendered regions. Use the chevron in the pill to open the
+          server-rendered regions. Click the number in the pill to open the
           panel.
         </li>
       </ol>

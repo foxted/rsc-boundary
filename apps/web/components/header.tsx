@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GitHubRepoLink } from "./github-repo-link";
 import { MobileNav } from "./mobile-nav";
 import { ThemeToggle } from "./theme-toggle";
 
@@ -36,6 +37,7 @@ export function Header() {
           </Link>
         </nav>
         <div className="flex items-center gap-2">
+          <GitHubRepoLink location="header" />
           <ThemeToggle />
           <MobileNav />
         </div>

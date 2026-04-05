@@ -1,3 +1,4 @@
+import { GitBranch, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 import { CodeBlock } from "../components/code-block";
 import { FeatureCard } from "../components/feature-card";
@@ -53,17 +54,17 @@ export default function HomePage() {
         <FeatureCard
           title="Zero config boundaries"
           description="Add a single provider to your root layout. Client subtrees get orange outlines; server regions show in blue when you toggle the devtools pill."
-          icon={<BoltIcon />}
+          icon={<Zap aria-hidden className="h-5 w-5" />}
         />
         <FeatureCard
           title="Dev-only by default"
           description="In production, the provider renders only children—no extra client bundle unless you opt in (this site uses enabled for the live demo)."
-          icon={<ShieldIcon />}
+          icon={<Shield aria-hidden className="h-5 w-5" />}
         />
         <FeatureCard
           title="Fiber-based detection"
           description="Walks the client React tree via DOM fiber pointers, filters framework noise, and keeps highlights in sync with a MutationObserver."
-          icon={<TreeIcon />}
+          icon={<GitBranch aria-hidden className="h-5 w-5" />}
         />
       </section>
 
@@ -77,44 +78,5 @@ export default function HomePage() {
         </div>
       </section>
     </main>
-  );
-}
-
-function BoltIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ShieldIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function TreeIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden>
-      <path
-        d="M12 22v-8M8 6a4 4 0 108 0 4 4 0 10-8 0zM12 14v-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }
