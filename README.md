@@ -54,6 +54,14 @@ export default function RootLayout({
 
 You do not need to change other components. A small control appears in development to toggle highlights. For devtools on a deployed site (like this repo’s demo), pass `enabled` on `RscBoundaryProvider`.
 
+### Agent skill (`install`)
+
+This repo includes a coding-agent skill that walks through the same integration steps; it lives at [`skills/install`](skills/install). Add it with **skills.sh** or:
+
+```bash
+npx skills add foxted/boundary --skill install
+```
+
 ## Contributing to this monorepo
 
 Layout, local dev, and where to put changes: **[`CONTRIBUTING.md`](CONTRIBUTING.md)** and [`AGENTS.md`](AGENTS.md).
