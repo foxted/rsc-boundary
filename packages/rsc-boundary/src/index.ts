@@ -6,6 +6,6 @@ export type {
   ServerRegionInfo,
   ServerRegionSource,
 } from "./types";
-export { RscBoundaryProvider } from "./provider";
-export { RscDevtools } from "./devtools";
-export { RscServerBoundaryMarker } from "./server-boundary-marker";
+export { RscBoundaryProvider } from "./components/provider";
+export { RscDevtools } from "./components/rsc-devtools";
+export { RscServerBoundaryMarker } from "./components/server-boundary-marker";

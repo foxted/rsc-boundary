@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
+import { SERVER_BOUNDARY_DATA_ATTR } from "../constants";
 
 interface RscServerBoundaryMarkerProps {
   children: ReactNode;

@@ -24,7 +24,7 @@
  */
 
 import type { ReactNode } from "react";
-import { RscDevtools } from "./devtools";
+import { RscDevtools } from "./rsc-devtools";
 
 interface RscBoundaryProviderProps {
   children: ReactNode;
