@@ -70,7 +70,6 @@ const NEXT_INTERNALS = new Set([
   "HTTPAccessErrorBoundary",
   // Our own devtools root components (sub-components filtered via DOM check)
   "RscDevtools",
-  "RscDevtoolsInner",
 ]);
 
 /**

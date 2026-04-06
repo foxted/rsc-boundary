@@ -34,10 +34,6 @@ import { Panel } from "./devtools-panel";
 import { Pill } from "./devtools-pill";
 
 export function RscDevtools() {
-  return <RscDevtoolsInner />;
-}
-
-function RscDevtoolsInner() {
   const [active, setActive] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [components, setComponents] = useState<ComponentInfo[]>([]);
