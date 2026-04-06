@@ -1,5 +1,6 @@
 import { useEffect, useRef, type MouseEvent } from "react";
 
+import { RSC_DEVTOOLS_DATA_ATTR } from "../constants";
 import {
   COLORS,
   PILL_STYLES,
@@ -35,7 +36,7 @@ export function Pill({
       ref={pillRef}
       type="button"
       onClick={onToggle}
-      data-rsc-devtools=""
+      {...{ [RSC_DEVTOOLS_DATA_ATTR]: "" }}
       aria-label="Toggle RSC Boundary highlighting"
       title="Toggle RSC Boundary highlighting"
     >
@@ -60,7 +61,7 @@ export function Pill({
               onPanelToggle(e as unknown as MouseEvent);
             }
           }}
-          data-rsc-devtools=""
+          {...{ [RSC_DEVTOOLS_DATA_ATTR]: "" }}
           style={{
             color: "rgba(255,255,255,0.7)",
             cursor: "pointer",

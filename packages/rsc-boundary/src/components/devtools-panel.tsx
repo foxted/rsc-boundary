@@ -5,6 +5,7 @@ import {
   type CSSProperties,
 } from "react";
 
+import { RSC_DEVTOOLS_DATA_ATTR } from "../constants";
 import type { ClientComponentInfo, ServerRegionInfo } from "../types";
 import { COLORS, PANEL_STYLES, applyStyles } from "../styles";
 import { LegendItem } from "./devtools-legend-item";
@@ -59,7 +60,7 @@ export function Panel({ clientComponents, serverRegions }: PanelProps) {
   };
 
   return (
-    <div ref={panelRef} data-rsc-devtools="">
+    <div ref={panelRef} {...{ [RSC_DEVTOOLS_DATA_ATTR]: "" }}>
       <div
         style={{
           marginBottom: 10,

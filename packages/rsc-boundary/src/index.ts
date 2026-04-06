@@ -2,6 +2,7 @@ export { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
 export { COLORS, LABEL_BASE_STYLES } from "./styles";
 export type {
   ClientComponentInfo,
+  HighlightKind,
   HighlightState,
   ServerRegionInfo,
   ServerRegionSource,

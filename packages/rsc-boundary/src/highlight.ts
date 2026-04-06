@@ -11,18 +11,28 @@
  *    (e.g. route navigation, lazy-loaded content).
  *
  * All styling uses inline styles — no global CSS is injected.
+ *
+ * Module state (`activeHighlights`, `MutationObserver`) assumes a single
+ * devtools overlay instance. Multiple concurrent mounts are unsupported and may
+ * corrupt restored outline/position styles and label nodes.
  */
 
+import {
+  RSC_DEVTOOLS_DATA_ATTR,
+  RSC_HIGHLIGHT_DATA_ATTR,
+  RSC_LABEL_DATA_ATTR,
+} from "./constants";
 import { formatDevtoolsLabelCaption } from "./highlight-caption";
 import type {
   ClientComponentInfo,
+  HighlightKind,
   ServerRegionInfo,
   ServerRegionSource,
 } from "./types";
 import { COLORS, LABEL_BASE_STYLES, applyStyles } from "./styles";
 
-const HIGHLIGHT_ATTR = "data-rsc-highlight";
-const LABEL_ATTR = "data-rsc-label";
+/** Debounced delay before re-scanning after DOM mutations (balance UI latency vs churn). */
+const DOM_MUTATION_DEBOUNCE_MS = 300;
 
 interface HighlightEntry {
   element: HTMLElement;
@@ -58,12 +68,12 @@ function withObserverPaused(callback: () => void): void {
 
 function createLabel(
   name: string,
-  kind: "server" | "client",
+  kind: HighlightKind,
   serverSource?: ServerRegionSource,
 ): HTMLElement {
   const label = document.createElement("div");
-  label.setAttribute(LABEL_ATTR, "");
-  label.setAttribute("data-rsc-devtools", "");
+  label.setAttribute(RSC_LABEL_DATA_ATTR, "");
+  label.setAttribute(RSC_DEVTOOLS_DATA_ATTR, "");
   label.textContent = formatDevtoolsLabelCaption(name, kind, serverSource);
   applyStyles(label, {
     ...LABEL_BASE_STYLES,
@@ -75,7 +85,7 @@ function createLabel(
 function highlightElement(
   element: HTMLElement,
   name: string,
-  kind: "server" | "client",
+  kind: HighlightKind,
   serverSource?: ServerRegionSource,
 ): HighlightEntry {
   const colors = kind === "client" ? COLORS.client : COLORS.server;
@@ -84,7 +94,7 @@ function highlightElement(
   const originalPosition = element.style.position;
 
   element.style.outline = `2px dashed ${colors.outline}`;
-  element.setAttribute(HIGHLIGHT_ATTR, kind);
+  element.setAttribute(RSC_HIGHLIGHT_DATA_ATTR, kind);
 
   // Labels need a positioned ancestor to sit correctly
   const computed = globalThis.getComputedStyle(element);
@@ -131,7 +141,7 @@ function removeHighlightsInternal(): void {
   for (const entry of activeHighlights) {
     entry.element.style.outline = entry.originalOutline;
     entry.element.style.position = entry.originalPosition;
-    entry.element.removeAttribute(HIGHLIGHT_ATTR);
+    entry.element.removeAttribute(RSC_HIGHLIGHT_DATA_ATTR);
     entry.label.remove();
   }
   activeHighlights = [];
@@ -158,7 +168,7 @@ export function observeDomChanges(onMutation: () => void): () => void {
 
   observer = new MutationObserver(() => {
     if (debounceTimer) clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(onMutation, 300);
+    debounceTimer = setTimeout(onMutation, DOM_MUTATION_DEBOUNCE_MS);
   });
 
   observer.observe(document.body, OBSERVER_OPTIONS);

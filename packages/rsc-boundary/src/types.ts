@@ -12,6 +12,9 @@ export interface ClientComponentInfo {
 /** How a server region was detected. */
 export type ServerRegionSource = "explicit" | "heuristic";
 
+/** Client vs server outline/label kind in devtools overlays. */
+export type HighlightKind = "client" | "server";
+
 /**
  * A highlighted server-rendered DOM region (explicit marker or heuristic).
  */

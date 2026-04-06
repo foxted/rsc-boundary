@@ -15,7 +15,7 @@
  * __reactFiber$* property that React attaches to DOM elements during hydration.
  */
 
-import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
+import { RSC_DEVTOOLS_DATA_ATTR, SERVER_BOUNDARY_DATA_ATTR } from "./constants";
 import { formatHostFallbackLabel } from "./host-label";
 import type { ClientComponentInfo, ServerRegionInfo } from "./types";
 
@@ -115,30 +115,36 @@ function isFiber(value: unknown): value is Fiber {
   );
 }
 
+interface FunctionWithMeta {
+  displayName?: string;
+  name?: string;
+}
+
+function getFunctionDisplayName(fn: FunctionWithMeta): string | null {
+  return fn.displayName ?? fn.name ?? null;
+}
+
 function getComponentName(fiber: Fiber): string | null {
   const type = fiber.type;
   if (!type) return null;
 
   if (typeof type === "function") {
-    return (type as { displayName?: string; name?: string }).displayName ??
-      (type as { name?: string }).name ?? null;
+    return getFunctionDisplayName(type as FunctionWithMeta);
   }
 
   if (typeof type === "object" && type !== null) {
-    // ForwardRef wraps a render function
+    // ForwardRef: render fn name wins; do not fall through if render exists (even when unnamed).
     if ("render" in type && typeof type.render === "function") {
-      return (type.render as { displayName?: string; name?: string }).displayName ??
-        (type.render as { name?: string }).name ?? null;
+      return getFunctionDisplayName(type.render as FunctionWithMeta);
     }
-    // MemoComponent wraps a type
-    if ("type" in type) {
-      const inner = (type as Record<string, unknown>).type;
-      if (typeof inner === "function") {
-        return (inner as { displayName?: string; name?: string }).displayName ??
-          (inner as { name?: string }).name ?? null;
-      }
+
+    // Memo / similar: inner function name wins; do not fall through when inner is a function.
+    const record = type as Record<string, unknown>;
+    if ("type" in record && typeof record.type === "function") {
+      return getFunctionDisplayName(record.type as FunctionWithMeta);
     }
-    return type.displayName ?? type.name ?? null;
+
+    return getFunctionDisplayName(type as FunctionWithMeta);
   }
 
   return null;
@@ -203,15 +209,25 @@ function findFiberRoot(): Fiber | null {
 }
 
 /**
- * Check whether a DOM node lives inside our own devtools overlay.
+ * True if `el` or one of its ancestors satisfies `predicate`.
  */
-function isInsideDevtools(el: HTMLElement): boolean {
+function someAncestor(
+  el: HTMLElement,
+  predicate: (node: HTMLElement) => boolean,
+): boolean {
   let current: HTMLElement | null = el;
   while (current) {
-    if (current.dataset.rscDevtools != null) return true;
+    if (predicate(current)) return true;
     current = current.parentElement;
   }
   return false;
+}
+
+/**
+ * Check whether a DOM node lives inside our own devtools overlay.
+ */
+function isInsideDevtools(el: HTMLElement): boolean {
+  return someAncestor(el, (node) => node.hasAttribute(RSC_DEVTOOLS_DATA_ATTR));
 }
 
 /**
@@ -252,12 +268,7 @@ function isInsideClientBoundary(
   el: HTMLElement,
   clientRoots: ReadonlySet<HTMLElement>,
 ): boolean {
-  let current: HTMLElement | null = el;
-  while (current) {
-    if (clientRoots.has(current)) return true;
-    current = current.parentElement;
-  }
-  return false;
+  return someAncestor(el, (node) => clientRoots.has(node));
 }
 
 /**
@@ -282,12 +293,7 @@ function isInsideExplicitMarkerSubtree(
   el: HTMLElement,
   explicitRoots: ReadonlySet<HTMLElement>,
 ): boolean {
-  let current: HTMLElement | null = el;
-  while (current) {
-    if (explicitRoots.has(current)) return true;
-    current = current.parentElement;
-  }
-  return false;
+  return someAncestor(el, (node) => explicitRoots.has(node));
 }
 
 function* elementDescendants(root: HTMLElement): Generator<HTMLElement> {

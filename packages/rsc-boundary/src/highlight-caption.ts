@@ -1,11 +1,11 @@
-import type { ServerRegionSource } from "./types";
+import type { HighlightKind, ServerRegionSource } from "./types";
 
 /**
  * Text shown on floating boundary labels (client vs server, explicit vs heuristic).
  */
 export function formatDevtoolsLabelCaption(
   name: string,
-  kind: "server" | "client",
+  kind: HighlightKind,
   serverSource?: ServerRegionSource,
 ): string {
   const prefix =
