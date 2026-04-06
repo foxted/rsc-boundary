@@ -39,7 +39,7 @@ A small floating pill appears in the bottom-left corner of your page during deve
 - **Labels** on each region showing the component name / host tag and provenance
 - **Panel** listing client components and server regions with explicit vs heuristic badges
 
-In production builds, `RscBoundaryProvider` renders only `{children}` — zero runtime cost, no extra DOM nodes, completely tree-shaken. Devtools run only in development (`NODE_ENV === "development"`).
+In production builds, `RscBoundaryProvider` renders only `{children}` — no devtools UI, no extra DOM nodes, and no scanning work. Devtools run only in development (`NODE_ENV === "development"`).
 
 The package also exports `RscDevtools` for advanced wiring, and optional `RscServerBoundaryMarker` / `SERVER_BOUNDARY_DATA_ATTR` for explicit server regions; most apps should rely on the provider only.
 
@@ -49,7 +49,7 @@ React Server Components are resolved on the server and sent to the client as pre
 
 When you toggle the devtools on, RSC Boundary walks the React fiber tree (via the `__reactFiber$*` property that React attaches to DOM elements) and:
 
-1. Finds every `FunctionComponent`, `ClassComponent`, `ForwardRef`, and `MemoComponent` fiber
+1. Finds every user component fiber: function, class, `forwardRef`, and `memo` (including simple memo) work tags
 2. Filters out Next.js framework internals (LayoutRouter, ErrorBoundary, etc.)
 3. Maps each remaining user-defined component to its root DOM node(s) — these are your **client component boundaries**
 4. Collects **explicit** regions: elements with `data-rsc-boundary-server` (e.g. `RscServerBoundaryMarker`)
@@ -62,14 +62,23 @@ A `MutationObserver` watches for DOM changes (route navigation, lazy loading) an
 ```
 packages/rsc-boundary/src/
 ├── index.ts                  # Public API
-├── constants.ts              # data attribute name for explicit markers
-├── provider.tsx              # Server component — children + <RscDevtools /> in dev
-├── server-boundary-marker.tsx # Optional explicit server region wrapper
-├── devtools.tsx              # "use client" — pill, panel, scan trigger
+├── constants.ts              # data attribute names (markers, devtools, highlights)
 ├── fiber-utils.ts            # Fiber walk + server region detection
 ├── highlight.ts              # Outlines, labels, MutationObserver
+├── highlight-caption.ts      # Label text for highlighted regions
+├── host-label.ts             # Fallback labels from host DOM
 ├── styles.ts
-└── types.ts
+├── types.ts
+└── components/
+    ├── provider.tsx                 # Server component — children + <RscDevtools /> in dev
+    ├── rsc-devtools.tsx             # "use client" — scan trigger, highlights, observer wiring
+    ├── devtools-pill.tsx            # Floating toggle
+    ├── devtools-panel.tsx           # Side panel + lists
+    ├── devtools-compare.ts          # Stable list diffing for panel updates
+    ├── devtools-legend-item.tsx
+    ├── devtools-client-component-entry.tsx
+    ├── devtools-server-region-entry.tsx
+    └── server-boundary-marker.tsx   # Optional explicit server region wrapper
 ```
 
 ## Limitations

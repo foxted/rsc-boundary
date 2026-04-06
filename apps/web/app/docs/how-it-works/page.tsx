@@ -38,7 +38,8 @@ export default function DocsHowItWorksPage() {
             walk the fiber tree (same family of internals React DevTools uses).
           </li>
           <li>
-            Collect user client components: function/class/forwardRef/memo fibers,
+            Collect user client components: function/class/forwardRef/memo (including
+            simple memo) fibers,
             with display names, excluding a known set of Next.js App Router internals.
           </li>
           <li>
