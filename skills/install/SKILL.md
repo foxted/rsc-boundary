@@ -85,7 +85,7 @@ If the app already wraps children in other providers, nest `RscBoundaryProvider`
 ## 3. Behavior to set expectations
 
 - **Development:** A small control (pill) appears; toggling it highlights client vs server regions. No changes are required in individual components for the default experience.
-- **Production:** By default the provider is a no-op (children only). For a docs or demo site that must show devtools in production, pass **`enabled`**: `<RscBoundaryProvider enabled>{children}</RscBoundaryProvider>`.
+- **Production:** The provider is a no-op (children only). Devtools never mount in production builds; use static UI or screenshots if you need to illustrate boundaries on a deployed site.
 
 ## 4. Optional API (only if the user asks)
 
@@ -106,4 +106,4 @@ Prefer `RscBoundaryProvider` unless the user’s setup requires splitting these.
 
 - **Peer dependency warnings:** Align `react` and `react-dom` to ^19 with the app’s Next.js version.
 - **Types / module not found:** Ensure install completed and, for workspace usage, that `packages/rsc-boundary` is built.
-- **Nothing in production:** Expected unless `enabled` is passed.
+- **Nothing in production:** Expected; devtools are development-only.

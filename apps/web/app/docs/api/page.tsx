@@ -14,10 +14,6 @@ const importSnippet = `import {
   SERVER_BOUNDARY_DATA_ATTR,
 } from "rsc-boundary";`;
 
-const enabledSnippet = `<RscBoundaryProvider enabled>
-  {children}
-</RscBoundaryProvider>`;
-
 export default function DocsApiPage() {
   return (
     <article className="max-w-3xl space-y-10">
@@ -65,16 +61,6 @@ export default function DocsApiPage() {
                 <td className="px-4 py-3 font-mono text-xs">ReactNode</td>
                 <td className="px-4 py-3">Your app tree.</td>
               </tr>
-              <tr>
-                <td className="px-4 py-3 font-mono text-foreground">enabled</td>
-                <td className="px-4 py-3 font-mono text-xs">boolean | undefined</td>
-                <td className="px-4 py-3">
-                  When <code>true</code>, always mounts devtools
-                  (including production). When omitted, devtools run only when{" "}
-                  <code>NODE_ENV === &quot;development&quot;</code>
-                  .
-                </td>
-              </tr>
             </tbody>
           </table>
         </div>
@@ -86,18 +72,10 @@ export default function DocsApiPage() {
             + floating devtools.
           </li>
           <li>
-            <strong className="text-foreground">Production, default:</strong> children
-            only; devtools are not mounted (no extra client chunk for the tool).
-          </li>
-          <li>
-            <strong className="text-foreground">Production + enabled:</strong> same as
-            dev—use sparingly (e.g. this documentation site).
+            <strong className="text-foreground">Production:</strong> children only;
+            devtools are not mounted (no client chunk for the tool).
           </li>
         </ul>
-
-        <div className="mt-6 not-prose">
-          <CodeBlock code={enabledSnippet} filename="Opt-in for production (docs)" />
-        </div>
       </section>
 
       <section>

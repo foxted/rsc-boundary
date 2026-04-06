@@ -19,8 +19,7 @@
  * ```
  *
  * In development, it renders `{children}` plus the `<RscDevtools />` floating
- * overlay. In production, it renders only `{children}` — zero runtime cost,
- * unless you pass `enabled` (e.g. for a documentation site).
+ * overlay. In production, it renders only `{children}` — zero runtime cost.
  */
 
 import type { ReactNode } from "react";
@@ -28,21 +27,15 @@ import { RscDevtools } from "./rsc-devtools";
 
 interface RscBoundaryProviderProps {
   children: ReactNode;
-  /** When `true`, always mount devtools (including production). When omitted, devtools run only in development. */
-  enabled?: boolean;
 }
 
-export function RscBoundaryProvider({
-  children,
-  enabled,
-}: RscBoundaryProviderProps) {
-  const shouldEnable =
-    enabled ?? process.env.NODE_ENV === "development";
+export function RscBoundaryProvider({ children }: RscBoundaryProviderProps) {
+  const isDev = process.env.NODE_ENV === "development";
 
   return (
     <>
       {children}
-      {shouldEnable ? <RscDevtools /> : null}
+      {isDev ? <RscDevtools /> : null}
     </>
   );
 }

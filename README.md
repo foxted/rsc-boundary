@@ -12,7 +12,7 @@ The published package is [`rsc-boundary`](packages/rsc-boundary). This repo also
 
 - **Make the RSC mental model concrete.** Server Components have no client fibers; Client Components hydrate. That split is easy to lose when you’re deep in JSX—this tool surfaces it on the page you’re building.
 - **Onboard and review faster.** Spot accidental client boundaries, nested server islands, and where interactivity actually lives without spelunking through `"use client"` directives.
-- **Zero ceremony in production.** In production builds the provider is a pass-through: no extra DOM, no runtime cost. Turn highlights on only when you want them (dev by default; optional `enabled` for deployed demos).
+- **Zero ceremony in production.** In production builds the provider is a pass-through: no extra DOM, no runtime cost. Highlights run only in development.
 
 ## What you get (dev mode)
 
@@ -52,7 +52,7 @@ export default function RootLayout({
 }
 ```
 
-You do not need to change other components. A small control appears in development to toggle highlights. For devtools on a deployed site (like this repo’s demo), pass `enabled` on `RscBoundaryProvider`.
+You do not need to change other components. A small control appears in development to toggle highlights. This repo’s docs site uses static outlined previews on the Examples page instead of running devtools in production.
 
 ### Agent skill (`install`)
 

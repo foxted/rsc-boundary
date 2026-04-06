@@ -38,6 +38,7 @@ export const docsSectionsByPath: Record<string, DocsSection[]> = {
     { id: "pipeline", label: "Pipeline" },
     { id: "what-you-see", label: "What you see" },
     { id: "explicit-markers", label: "Explicit markers" },
+    { id: "dev-vs-production", label: "Dev vs production" },
     { id: "limitations", label: "Limitations" },
   ],
 };

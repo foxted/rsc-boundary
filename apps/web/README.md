@@ -18,4 +18,4 @@ pnpm dev
 pnpm build
 ```
 
-The root layout wraps the app with `RscBoundaryProvider enabled` so RSC Boundary devtools work in production on this site.
+The documentation **Examples** page uses static outline components (`FakeServerChrome` / `FakeClientChrome`) that reuse `COLORS` from `rsc-boundary` so deployed docs can preview the look without mounting devtools in production.

@@ -74,7 +74,7 @@ export default function HomePage() {
         />
         <FeatureCard
           title="Dev-only by default"
-          description="In production, the provider renders only children—no extra client bundle unless you opt in (this site uses enabled for the live demo)."
+          description="In production, the provider renders only children—no devtools bundle. The docs Examples page uses static outlined previews so you can see the color language on a live site."
           icon={<Shield aria-hidden className="h-5 w-5" />}
         />
         <FeatureCard

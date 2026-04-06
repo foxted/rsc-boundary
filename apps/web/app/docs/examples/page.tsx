@@ -13,54 +13,62 @@ export const metadata: Metadata = {
 };
 
 const staticBlockSnippet = `// components/examples/server-static-block.tsx
-// No "use client" — no client components in this subtree.
+import { RscServerBoundaryMarker } from "rsc-boundary";
 
 export function ServerStaticBlock() {
   return (
-    <div className="rounded-xl border ...">
-      <p>Server-only subtree</p>
-      ...
-    </div>
+    <RscServerBoundaryMarker label="ExampleServerOnly">
+      <div className="rounded-xl border ...">{/* server-only content */}</div>
+    </RscServerBoundaryMarker>
   );
 }`;
 
 const serverCounterSnippet = `// components/examples/server-counter-demo.tsx
+import { RscServerBoundaryMarker } from "rsc-boundary";
 import { Counter } from "./counter";
 
 export function ServerCounterDemo() {
   return (
-    <div className="...">
-      <p>Server Component shell — static copy here.</p>
-      <Counter />
-    </div>
+    <RscServerBoundaryMarker label="ExampleServerShellCounter">
+      <div className="...">
+        <p>Server Component shell — static copy here.</p>
+        <Counter />
+      </div>
+    </RscServerBoundaryMarker>
   );
 }`;
 
 const serverAccordionSnippet = `// components/examples/server-accordion-demo.tsx
+import { RscServerBoundaryMarker } from "rsc-boundary";
 import { Accordion } from "./accordion";
 
 const FAQ_ITEMS = [/* ... */];
 
 export function ServerAccordionDemo() {
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted">...</p>
-      <Accordion items={FAQ_ITEMS} />
-    </div>
+    <RscServerBoundaryMarker label="ExampleServerAccordion">
+      <div className="space-y-3">
+        <p className="text-sm text-muted">...</p>
+        <Accordion items={FAQ_ITEMS} />
+      </div>
+    </RscServerBoundaryMarker>
   );
 }`;
 
 const serverSearchSnippet = `// components/examples/server-search-demo.tsx
+import { RscServerBoundaryMarker } from "rsc-boundary";
 import { SearchFilter } from "./search-filter";
 
 const SERVER_RENDERED_ITEMS = [/* ... */] as const;
 
 export function ServerSearchDemo() {
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-muted">...</p>
-      <SearchFilter items={SERVER_RENDERED_ITEMS} />
-    </div>
+    <RscServerBoundaryMarker label="ExampleServerSearch">
+      <div className="space-y-3">
+        <p className="text-sm text-muted">...</p>
+        <SearchFilter items={SERVER_RENDERED_ITEMS} />
+      </div>
+    </RscServerBoundaryMarker>
   );
 }`;
 
@@ -88,16 +96,22 @@ export default function DocsExamplesPage() {
           Examples
         </h1>
         <p className="mt-4 text-muted">
-          Each pattern below lives partly in{" "}
+          Each pattern below mixes{" "}
           <strong className="text-foreground">Server Component</strong> modules (no{" "}
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             &quot;use client&quot;
           </code>
-          ) and partly in <strong className="text-foreground">Client Components</strong>
-          . This page route is also a Server Component. Use the RSC devtools to compare
-          blue (server) and orange (client) outlines. Server entries show{" "}
-          <strong className="text-foreground">explicit</strong> vs{" "}
-          <strong className="text-foreground">~</strong> (heuristic) in the panel.
+          ) with <strong className="text-foreground">Client Components</strong>.{" "}
+          <strong className="text-foreground">Blue and orange outlines</strong> on this
+          page are{" "}
+          <strong className="text-foreground">static illustrations</strong> (same
+          colors as the real devtools)—they are not fiber-based detection. Add{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">
+            RscBoundaryProvider
+          </code>{" "}
+          to your app and run{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">next dev</code>{" "}
+          for the interactive pill, panel, and live highlights.
         </p>
       </div>
 
@@ -110,9 +124,13 @@ export default function DocsExamplesPage() {
         </h2>
         <p className="text-muted">
           A small module that renders only on the server, with no client children.
-          Highlights should cover this card entirely as server output.
+          The outline mimics an explicit server region; the code uses{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">
+            RscServerBoundaryMarker
+          </code>{" "}
+          so development devtools can pick up the same label.
         </p>
-        <ServerStaticBlock />
+        <ServerStaticBlock illustrativeBoundaryChrome />
         <CodeBlock
           code={staticBlockSnippet}
           filename="components/examples/server-static-block.tsx"
@@ -127,11 +145,11 @@ export default function DocsExamplesPage() {
           Server shell + counter island
         </h2>
         <p className="text-muted">
-          The demo component is defined in a server file: static copy wraps a client
-          <code className="mx-1 rounded bg-muted px-1 py-0.5 text-xs">Counter</code>
-          import.
+          The demo component is defined in a server file: an explicit marker wraps the
+          shell; static copy sits next to a client{" "}
+          <code className="mx-1 rounded bg-muted px-1 py-0.5 text-xs">Counter</code>.
         </p>
-        <ServerCounterDemo />
+        <ServerCounterDemo illustrativeBoundaryChrome />
         <CodeBlock
           code={serverCounterSnippet}
           filename="components/examples/server-counter-demo.tsx"
@@ -146,7 +164,7 @@ export default function DocsExamplesPage() {
           FAQ items are authored in the server module; only the accordion UI is
           client-side for open/close state.
         </p>
-        <ServerAccordionDemo />
+        <ServerAccordionDemo illustrativeBoundaryChrome />
         <CodeBlock
           code={serverAccordionSnippet}
           filename="components/examples/server-accordion-demo.tsx"
@@ -164,7 +182,7 @@ export default function DocsExamplesPage() {
           The searchable list source is defined on the server; filtering runs in the
           client without a round trip.
         </p>
-        <ServerSearchDemo />
+        <ServerSearchDemo illustrativeBoundaryChrome />
         <CodeBlock
           code={serverSearchSnippet}
           filename="components/examples/server-search-demo.tsx"
@@ -179,11 +197,11 @@ export default function DocsExamplesPage() {
           Explicit + heuristic regions
         </h2>
         <p className="text-muted">
-          Optional <code className="rounded bg-muted px-1 py-0.5 text-xs">RscServerBoundaryMarker</code>{" "}
-          labels a subtree as an explicit server region; the sibling block below relies
-          on nested heuristic detection only.
+          The first block uses a marker; the second has no marker so development
+          devtools can show a <strong className="text-foreground">~</strong> heuristic
+          region. Below, the static outlines show both styles side by side.
         </p>
-        <ServerHybridDemo />
+        <ServerHybridDemo illustrativeBoundaryChrome />
         <CodeBlock
           code={hybridSnippet}
           filename="components/examples/server-hybrid-demo.tsx"

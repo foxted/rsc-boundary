@@ -39,13 +39,7 @@ A small floating pill appears in the bottom-left corner of your page during deve
 - **Labels** on each region showing the component name / host tag and provenance
 - **Panel** listing client components and server regions with explicit vs heuristic badges
 
-In production builds, `RscBoundaryProvider` renders only `{children}` — zero runtime cost, no extra DOM nodes, completely tree-shaken.
-
-To force devtools in production (e.g. a documentation site), pass `enabled`:
-
-```tsx
-<RscBoundaryProvider enabled>{children}</RscBoundaryProvider>
-```
+In production builds, `RscBoundaryProvider` renders only `{children}` — zero runtime cost, no extra DOM nodes, completely tree-shaken. Devtools run only in development (`NODE_ENV === "development"`).
 
 The package also exports `RscDevtools` for advanced wiring, and optional `RscServerBoundaryMarker` / `SERVER_BOUNDARY_DATA_ATTR` for explicit server regions; most apps should rely on the provider only.
 

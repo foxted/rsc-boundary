@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { CodeBlock } from "../../components/code-block";
 import { PackageInstall } from "../../components/package-install";
 
@@ -35,12 +36,19 @@ export default function DocsGettingStartedPage() {
       </p>
       <aside className="mt-6 rounded-lg border border-border bg-card p-4 text-sm text-muted">
         <p>
-          <strong className="text-foreground">Try it on these pages.</strong>{" "}
-          RSC Boundary is available on every page in this documentation
-          section. Use the <strong className="text-foreground">RSC</strong>{" "}
-          control in the bottom-left corner to turn on boundary highlights and
-          open the component list—you can see the tool in action while you
-          read.
+          <strong className="text-foreground">See it in your app.</strong>{" "}
+          Add the provider to your root layout and run{" "}
+          <code>next dev</code>: use the <strong className="text-foreground">RSC</strong>{" "}
+          control (bottom-left) to toggle live highlights. On this site, the{" "}
+          <Link
+            href="/docs/examples"
+            className="font-medium text-accent hover:underline"
+          >
+            Examples
+          </Link>{" "}
+          page uses <strong className="text-foreground">static outlines</strong> so
+          the deployed docs can show the idea without shipping devtools in
+          production.
         </p>
       </aside>
 
@@ -92,18 +100,19 @@ export default function DocsGettingStartedPage() {
       </h2>
       <ol className="mt-3 list-inside list-decimal space-y-2 text-muted">
         <li>
-          On this site, stay on a documentation page and click the{" "}
-          <strong className="text-foreground">RSC</strong> pill (bottom-left) to
-          activate the tool—no local setup required.
+          On the <Link href="/docs/examples" className="font-medium text-accent hover:underline">Examples</Link>{" "}
+          page, blue and orange borders are static illustrations (not live
+          devtools).
         </li>
         <li>
           In your own project, run <code>next dev</code> with the provider in
-          your root layout, open any route, and use the same pill.
+          your root layout, open any route, and use the <strong className="text-foreground">RSC</strong>{" "}
+          pill (bottom-left).
         </li>
         <li>
-          Orange dashed outlines mark client subtrees; blue marks
-          server-rendered regions. Click the number in the pill to open the
-          panel.
+          Orange dashed outlines mark client subtrees; blue marks server regions
+          (explicit labels from markers, or ~ heuristics). Click the number in
+          the pill to open the panel.
         </li>
       </ol>
     </article>

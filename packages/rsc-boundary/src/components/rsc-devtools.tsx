@@ -11,7 +11,7 @@
  * A companion panel lists detected components with counts and a legend.
  *
  * This component is client-only ("use client"). Mounting is controlled by
- * `RscBoundaryProvider` (development by default, or when `enabled` is set).
+ * `RscBoundaryProvider` (development only).
  */
 
 import {

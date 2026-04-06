@@ -110,6 +110,28 @@ export default function DocsHowItWorksPage() {
 
       <section>
         <h2
+          id="dev-vs-production"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          Development vs production builds
+        </h2>
+        <p className="mt-4 text-muted">
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">RscBoundaryProvider</code>{" "}
+          mounts devtools only when{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">NODE_ENV</code>{" "}
+          is <code className="rounded bg-muted px-1 py-0.5 text-xs">development</code>
+          . Production bundles ship no scanning UI. This documentation site uses{" "}
+          <strong className="text-foreground">static outlined previews</strong> on the{" "}
+          <Link href="/docs/examples" className="font-medium text-accent hover:underline">
+            Examples
+          </Link>{" "}
+          page so you can see the color language without running fiber detection on a
+          public build.
+        </p>
+      </section>
+
+      <section>
+        <h2
           id="limitations"
           className="scroll-mt-24 text-xl font-semibold text-foreground"
         >

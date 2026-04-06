@@ -25,7 +25,7 @@ export function DocsPager() {
 
   return (
     <nav
-      className="mx-auto mt-16 max-w-3xl border-t border-border pt-8"
+      className="mt-16 max-w-3xl border-t border-border pt-8"
       aria-label="Previous and next documentation pages"
     >
       <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">

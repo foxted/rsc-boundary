@@ -1,4 +1,11 @@
+import { RscServerBoundaryMarker } from "rsc-boundary";
+
+import { FakeClientChrome, FakeServerChrome } from "./boundary-chrome";
 import { SearchFilter } from "./search-filter";
+
+export interface ServerSearchDemoProps {
+  illustrativeBoundaryChrome?: boolean;
+}
 
 const SERVER_RENDERED_ITEMS = [
   "use server — layout shell",
@@ -11,8 +18,10 @@ const SERVER_RENDERED_ITEMS = [
 /**
  * Server Component: the list source lives on the server; filtering runs in the client.
  */
-export function ServerSearchDemo() {
-  return (
+export function ServerSearchDemo({
+  illustrativeBoundaryChrome = false,
+}: ServerSearchDemoProps) {
+  const shell = (
     <div className="space-y-3">
       <p className="text-sm text-muted">
         The array{" "}
@@ -22,7 +31,23 @@ export function ServerSearchDemo() {
         is defined in this server module. The filter input narrows results on the
         client without a round trip.
       </p>
-      <SearchFilter items={SERVER_RENDERED_ITEMS} />
+      {illustrativeBoundaryChrome ? (
+        <FakeClientChrome label="SearchFilter">
+          <SearchFilter items={SERVER_RENDERED_ITEMS} />
+        </FakeClientChrome>
+      ) : (
+        <SearchFilter items={SERVER_RENDERED_ITEMS} />
+      )}
     </div>
+  );
+
+  return (
+    <RscServerBoundaryMarker label="ExampleServerSearch">
+      {illustrativeBoundaryChrome ? (
+        <FakeServerChrome label="ExampleServerSearch">{shell}</FakeServerChrome>
+      ) : (
+        shell
+      )}
+    </RscServerBoundaryMarker>
   );
 }
