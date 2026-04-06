@@ -4,7 +4,7 @@
  * by exclusion (DOM regions not owned by any client component) and/or
  * optional explicit markers.
  */
-export interface ComponentInfo {
+export interface ClientComponentInfo {
   name: string;
   domNodes: HTMLElement[];
 }
@@ -24,5 +24,5 @@ export interface ServerRegionInfo {
 
 export interface HighlightState {
   enabled: boolean;
-  components: ComponentInfo[];
+  clientComponents: ClientComponentInfo[];
 }

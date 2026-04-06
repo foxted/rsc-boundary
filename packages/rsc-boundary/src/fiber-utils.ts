@@ -17,7 +17,7 @@
 
 import { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
 import { formatHostFallbackLabel } from "./host-label";
-import type { ComponentInfo, ServerRegionInfo } from "./types";
+import type { ClientComponentInfo, ServerRegionInfo } from "./types";
 
 // React fiber work tags (numeric constants from React source)
 const FUNCTION_COMPONENT = 0;
@@ -221,11 +221,11 @@ function isInsideDevtools(el: HTMLElement): boolean {
  * Server regions combine explicit markers with heuristic DOM outside client
  * subtrees (see getServerRegions).
  */
-export function scanFiberTree(): ComponentInfo[] {
+export function scanFiberTree(): ClientComponentInfo[] {
   const root = findFiberRoot();
   if (!root) return [];
 
-  const components: ComponentInfo[] = [];
+  const components: ClientComponentInfo[] = [];
 
   function walk(fiber: Fiber | null): void {
     if (!fiber) return;
@@ -346,7 +346,7 @@ function heuristicRegionPanelLabel(
  * subtrees already covered by explicit markers.
  */
 function collectHeuristicServerRegions(
-  clientComponents: ComponentInfo[],
+  clientComponents: ClientComponentInfo[],
   explicitMarkerElements: ReadonlySet<HTMLElement>,
   container: HTMLElement,
 ): ServerRegionInfo[] {
@@ -397,7 +397,7 @@ function collectHeuristicServerRegions(
  * nested regions outside client component DOM subtrees.
  */
 export function getServerRegions(
-  clientComponents: ComponentInfo[],
+  clientComponents: ClientComponentInfo[],
   container?: HTMLElement,
 ): ServerRegionInfo[] {
   const root = container ?? document.getElementById("__next") ?? document.body;

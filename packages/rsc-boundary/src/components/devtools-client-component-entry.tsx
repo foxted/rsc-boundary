@@ -1,11 +1,11 @@
-import type { ComponentInfo } from "../types";
+import type { ClientComponentInfo } from "../types";
 import { COLORS } from "../styles";
 
-interface ComponentEntryProps {
-  component: ComponentInfo;
+interface ClientComponentEntryProps {
+  component: ClientComponentInfo;
 }
 
-export function ComponentEntry({ component }: ComponentEntryProps) {
+export function ClientComponentEntry({ component }: ClientComponentEntryProps) {
   return (
     <div
       style={{

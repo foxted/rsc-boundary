@@ -22,30 +22,34 @@ import {
   type MouseEvent,
 } from "react";
 
-import type { ComponentInfo, ServerRegionInfo } from "../types";
+import type { ClientComponentInfo, ServerRegionInfo } from "../types";
 import { scanFiberTree, getServerRegions } from "../fiber-utils";
 import {
   applyHighlights,
   removeHighlights,
   observeDomChanges,
 } from "../highlight";
-import { componentListEqual, serverRegionsEqual } from "./devtools-compare";
+import { clientComponentListEqual, serverRegionsEqual } from "./devtools-compare";
 import { Panel } from "./devtools-panel";
 import { Pill } from "./devtools-pill";
 
 export function RscDevtools() {
   const [active, setActive] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
-  const [components, setComponents] = useState<ComponentInfo[]>([]);
+  const [clientComponents, setClientComponents] = useState<
+    ClientComponentInfo[]
+  >([]);
   const [serverRegions, setServerRegions] = useState<ServerRegionInfo[]>([]);
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const scan = useCallback(() => {
-    const clientComponents = scanFiberTree();
-    const nextServerRegions = getServerRegions(clientComponents);
-    applyHighlights(clientComponents, nextServerRegions);
-    setComponents((prev) =>
-      componentListEqual(prev, clientComponents) ? prev : clientComponents,
+    const nextClientComponents = scanFiberTree();
+    const nextServerRegions = getServerRegions(nextClientComponents);
+    applyHighlights(nextClientComponents, nextServerRegions);
+    setClientComponents((prev) =>
+      clientComponentListEqual(prev, nextClientComponents)
+        ? prev
+        : nextClientComponents,
     );
     setServerRegions((prev) =>
       serverRegionsEqual(prev, nextServerRegions) ? prev : nextServerRegions,
@@ -64,7 +68,7 @@ export function RscDevtools() {
     removeHighlights();
     cleanupRef.current?.();
     cleanupRef.current = null;
-    setComponents([]);
+    setClientComponents([]);
     setServerRegions([]);
   }, []);
 
@@ -101,13 +105,13 @@ export function RscDevtools() {
   return (
     <>
       {panelOpen && active && (
-        <Panel components={components} serverRegions={serverRegions} />
+        <Panel clientComponents={clientComponents} serverRegions={serverRegions} />
       )}
       <Pill
         active={active}
         onToggle={handleToggle}
         onPanelToggle={handlePanelToggle}
-        clientCount={components.length}
+        clientCount={clientComponents.length}
       />
     </>
   );

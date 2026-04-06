@@ -14,7 +14,11 @@
  */
 
 import { formatDevtoolsLabelCaption } from "./highlight-caption";
-import type { ComponentInfo, ServerRegionInfo, ServerRegionSource } from "./types";
+import type {
+  ClientComponentInfo,
+  ServerRegionInfo,
+  ServerRegionSource,
+} from "./types";
 import { COLORS, LABEL_BASE_STYLES, applyStyles } from "./styles";
 
 const HIGHLIGHT_ATTR = "data-rsc-highlight";
@@ -98,7 +102,7 @@ function highlightElement(
  * Apply highlights to detected client components and server regions.
  */
 export function applyHighlights(
-  clientComponents: ComponentInfo[],
+  clientComponents: ClientComponentInfo[],
   serverRegions: ServerRegionInfo[],
 ): void {
   withObserverPaused(() => {

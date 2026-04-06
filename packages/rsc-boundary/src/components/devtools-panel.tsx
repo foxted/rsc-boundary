@@ -5,20 +5,20 @@ import {
   type CSSProperties,
 } from "react";
 
-import type { ComponentInfo, ServerRegionInfo } from "../types";
+import type { ClientComponentInfo, ServerRegionInfo } from "../types";
 import { COLORS, PANEL_STYLES, applyStyles } from "../styles";
 import { LegendItem } from "./devtools-legend-item";
-import { ComponentEntry } from "./devtools-component-entry";
+import { ClientComponentEntry } from "./devtools-client-component-entry";
 import { ServerRegionEntry } from "./devtools-server-region-entry";
 
 type PanelTab = "client" | "server";
 
 export interface PanelProps {
-  components: ComponentInfo[];
+  clientComponents: ClientComponentInfo[];
   serverRegions: ServerRegionInfo[];
 }
 
-export function Panel({ components, serverRegions }: PanelProps) {
+export function Panel({ clientComponents, serverRegions }: PanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const [tab, setTab] = useState<PanelTab>("client");
 
@@ -118,7 +118,7 @@ export function Panel({ components, serverRegions }: PanelProps) {
           aria-selected={tab === "client"}
           id="rsc-panel-tab-client"
           aria-controls="rsc-panel-client"
-          aria-label={`${components.length} client component${components.length !== 1 ? "s" : ""}`}
+          aria-label={`${clientComponents.length} client component${clientComponents.length !== 1 ? "s" : ""}`}
           onClick={() => setTab("client")}
           style={{
             ...tabBase,
@@ -133,9 +133,9 @@ export function Panel({ components, serverRegions }: PanelProps) {
             marginBottom: -1,
           }}
         >
-          <span style={tabLine1}>{components.length}</span>
+          <span style={tabLine1}>{clientComponents.length}</span>
           <span style={tabLine2}>
-            client component{components.length !== 1 ? "s" : ""}
+            client component{clientComponents.length !== 1 ? "s" : ""}
           </span>
         </button>
         <button
@@ -172,10 +172,10 @@ export function Panel({ components, serverRegions }: PanelProps) {
           role="tabpanel"
           aria-labelledby="rsc-panel-tab-client"
         >
-          {components.length > 0 ? (
+          {clientComponents.length > 0 ? (
             <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
-              {components.map((comp, i) => (
-                <ComponentEntry key={`${comp.name}-${i}`} component={comp} />
+              {clientComponents.map((comp, i) => (
+                <ClientComponentEntry key={`${comp.name}-${i}`} component={comp} />
               ))}
             </div>
           ) : (
@@ -213,7 +213,7 @@ export function Panel({ components, serverRegions }: PanelProps) {
             </div>
           ) : (
             <div style={{ color: "rgba(255,255,255,0.4)", fontSize: 11 }}>
-              {components.length > 0 ? (
+              {clientComponents.length > 0 ? (
                 <>
                   No server regions in this view (everything may sit under
                   client boundaries).

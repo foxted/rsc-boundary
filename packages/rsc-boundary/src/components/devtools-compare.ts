@@ -1,8 +1,8 @@
-import type { ComponentInfo, ServerRegionInfo } from "../types";
+import type { ClientComponentInfo, ServerRegionInfo } from "../types";
 
-export function componentListEqual(
-  a: ComponentInfo[],
-  b: ComponentInfo[],
+export function clientComponentListEqual(
+  a: ClientComponentInfo[],
+  b: ClientComponentInfo[],
 ): boolean {
   if (a.length !== b.length) {
     return false;
