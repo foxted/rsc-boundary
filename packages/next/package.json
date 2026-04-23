@@ -1,6 +1,6 @@
 {
-  "name": "@rsc-boundary/core",
-  "version": "1.0.0",
+  "name": "@rsc-boundary/next",
+  "version": "0.2.0",
   "type": "module",
   "license": "MIT",
   "repository": {
@@ -31,8 +31,17 @@
     "provenance": true
   },
   "peerDependencies": {
+    "next": "^16.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "next": {
+      "optional": true
+    }
+  },
+  "dependencies": {
+    "@rsc-boundary/core": "workspace:*"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

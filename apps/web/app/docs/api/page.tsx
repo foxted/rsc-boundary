@@ -207,10 +207,10 @@ export default function DocsApiPage() {
           Legacy <code className="text-lg">rsc-boundary</code> package
         </h2>
         <p className="mt-2 text-muted">
-          The unscoped <code>rsc-boundary</code> npm package re-exports{" "}
-          <code>@rsc-boundary/next</code> for backward compatibility. New projects
-          should depend on <code>@rsc-boundary/next</code> or{" "}
-          <code>@rsc-boundary/start</code> directly.
+          The unscoped <code>rsc-boundary</code> package on npm is{" "}
+          <strong>deprecated</strong> and no longer published from this repository.
+          Use <code>@rsc-boundary/next</code> or <code>@rsc-boundary/start</code>{" "}
+          instead (each includes <code>@rsc-boundary/core</code> as a dependency).
         </p>
       </section>
 

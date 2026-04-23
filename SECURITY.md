@@ -18,7 +18,7 @@ We do not publish a maintainer email in this repository; GitHub is the intended 
 
 In scope for coordinated disclosure:
 
-- The published [`rsc-boundary`](https://www.npmjs.com/package/rsc-boundary) package (`packages/rsc-boundary`)
+- The published [`@rsc-boundary/core`](https://www.npmjs.com/package/@rsc-boundary/core), [`@rsc-boundary/next`](https://www.npmjs.com/package/@rsc-boundary/next), and [`@rsc-boundary/start`](https://www.npmjs.com/package/@rsc-boundary/start) packages (`packages/core`, `packages/next`, `packages/start`)
 - The demo and documentation site in `apps/web` when deployed from this repository
 
 Out of scope (report upstream or to the relevant vendor):
@@ -28,7 +28,7 @@ Out of scope (report upstream or to the relevant vendor):
 
 ## Supported versions
 
-Security fixes are applied to the **latest published** `rsc-boundary` release on npm. Backports to older lines may be done when practical; if you are on an older version, upgrading is the most reliable way to receive fixes.
+Security fixes are applied to the **latest published** `@rsc-boundary/*` releases on npm. Backports to older lines may be done when practical; if you are on an older version, upgrading is the most reliable way to receive fixes.
 
 ## Disclosure
 

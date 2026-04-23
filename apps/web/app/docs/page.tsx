@@ -202,12 +202,10 @@ export default function DocsGettingStartedPage() {
       <p className="mt-3 text-sm text-muted">
         The unscoped{" "}
         <code className="rounded bg-muted px-1 py-0.5 text-xs">rsc-boundary</code>{" "}
-        package is a compatibility shim that re-exports{" "}
-        <code className="rounded bg-muted px-1 py-0.5 text-xs">
-          @rsc-boundary/next
-        </code>
-        . Prefer <code>@rsc-boundary/next</code> or{" "}
-        <code>@rsc-boundary/start</code> for new projects.
+        package on npm is <strong>deprecated</strong> and is no longer published
+        from this repository. Use <code>@rsc-boundary/next</code> or{" "}
+        <code>@rsc-boundary/start</code> (each includes{" "}
+        <code>@rsc-boundary/core</code> as a dependency).
       </p>
 
       <h2

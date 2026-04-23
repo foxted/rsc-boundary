@@ -10,19 +10,18 @@ Monorepo for **RSC Boundary**: tooling that visualizes the boundary between **Re
 
 | Path | Role |
 | ---- | ---- |
-| `packages/rsc-boundary-core` | `@rsc-boundary/core` — framework-agnostic: fiber walk, highlights, devtools UI, `FrameworkAdapter` contract. |
-| `packages/rsc-boundary-next` | `@rsc-boundary/next` — Next.js App Router adapter + `RscBoundaryProvider`. |
-| `packages/rsc-boundary-start` | `@rsc-boundary/start` — TanStack Start adapter + `RscBoundaryProvider`. |
-| `packages/rsc-boundary` | `rsc-boundary` — back-compat shim that re-exports `@rsc-boundary/next`. Do not add logic here. |
-| `apps/web` | Next.js app: marketing, docs snippets, interactive examples. Depends on `rsc-boundary` via `workspace:*`. |
+| `packages/core` | `@rsc-boundary/core` — framework-agnostic: fiber walk, highlights, devtools UI, `FrameworkAdapter` contract. |
+| `packages/next` | `@rsc-boundary/next` — Next.js App Router adapter + `RscBoundaryProvider`. |
+| `packages/start` | `@rsc-boundary/start` — TanStack Start adapter + `RscBoundaryProvider`. |
+| `apps/web` | Next.js app: marketing, docs snippets, interactive examples. Depends on `@rsc-boundary/next` via `workspace:*`. |
 | `playgrounds/next` | Minimal Next.js 16 App Router app that smoke-tests `@rsc-boundary/next`. Private, not published. |
 | `playgrounds/start` | Minimal TanStack Start app that smoke-tests `@rsc-boundary/start`. Private, not published. |
 | `config/eslint-config`, `config/typescript-config` | Shared ESLint and TypeScript configs (`@repo/eslint-config`, `@repo/typescript-config`). |
 
 **Rule of thumb:**
-- Framework-agnostic detection / highlight logic → `packages/rsc-boundary-core`.
-- Next.js-specific adapter changes (internals list, root element) → `packages/rsc-boundary-next`.
-- TanStack Start-specific adapter changes → `packages/rsc-boundary-start`.
+- Framework-agnostic detection / highlight logic → `packages/core`.
+- Next.js-specific adapter changes (internals list, root element) → `packages/next`.
+- TanStack Start-specific adapter changes → `packages/start`.
 - Wiring, copy, and example routes for the public site → `apps/web`.
 
 ## Stack

@@ -4,7 +4,6 @@
   "commit": false,
   "fixed": [
     [
-      "rsc-boundary",
       "@rsc-boundary/core",
       "@rsc-boundary/next",
       "@rsc-boundary/start"

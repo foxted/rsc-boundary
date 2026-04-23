@@ -66,14 +66,16 @@ Wrap `children` in your root route (`app/routes/__root.tsx`):
 import { RscBoundaryProvider } from "@rsc-boundary/start";
 ```
 
-See [`packages/rsc-boundary-start/README.md`](packages/rsc-boundary-start/README.md) for the full integration guide.
+See [`packages/start/README.md`](packages/start/README.md) for the full integration guide.
 
 ### Migrating from `rsc-boundary`
 
-The legacy `rsc-boundary` package is now a back-compat shim for `@rsc-boundary/next`. Existing code keeps working — when you're ready, migrate in two steps:
+The unscoped `rsc-boundary` package on npm is **deprecated** — it is no longer published from this monorepo. **Next.js (App Router):** install `@rsc-boundary/next` (includes `@rsc-boundary/core` as a dependency). **TanStack Start:** install `@rsc-boundary/start` (same).
 
 ```bash
 pnpm remove rsc-boundary && pnpm add @rsc-boundary/next
+# or, for Start:
+pnpm remove rsc-boundary && pnpm add @rsc-boundary/start
 ```
 
 ```diff
@@ -85,10 +87,9 @@ pnpm remove rsc-boundary && pnpm add @rsc-boundary/next
 
 | Package | Description |
 |---|---|
-| [`@rsc-boundary/core`](packages/rsc-boundary-core) | Framework-agnostic: fiber walk, highlighting engine, devtools UI, adapter contract |
-| [`@rsc-boundary/next`](packages/rsc-boundary-next) | Next.js App Router adapter + `RscBoundaryProvider` |
-| [`@rsc-boundary/start`](packages/rsc-boundary-start) | TanStack Start adapter + `RscBoundaryProvider` |
-| [`rsc-boundary`](packages/rsc-boundary) | Back-compat shim — re-exports `@rsc-boundary/next` |
+| [`@rsc-boundary/core`](packages/core) | Framework-agnostic: fiber walk, highlighting engine, devtools UI, adapter contract |
+| [`@rsc-boundary/next`](packages/next) | Next.js App Router adapter + `RscBoundaryProvider` |
+| [`@rsc-boundary/start`](packages/start) | TanStack Start adapter + `RscBoundaryProvider` |
 
 For behavior details, optional APIs (`RscDevtools`, explicit server markers), architecture, and limitations, read the per-package READMEs.
 
@@ -110,12 +111,18 @@ Layout, local dev, and where to put changes: **[`CONTRIBUTING.md`](CONTRIBUTING.
 
 ## Releases
 
-Versioning and publishing use [Changesets](https://github.com/changesets/changesets). All four publishable packages are versioned together (same version at every release). From the repo root:
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets). The three publishable packages are versioned together (same version at every release). From the repo root:
 
 ```bash
 pnpm changeset        # describe changes
 pnpm version-packages # bump versions from changesets
 pnpm release          # build packages and publish (maintainers)
+```
+
+**Maintainers:** after the scoped packages are on npm, deprecate the legacy unscoped package so installs show a migration hint:
+
+```bash
+npm deprecate rsc-boundary@"*" "rsc-boundary has moved. Install @rsc-boundary/next (Next.js) or @rsc-boundary/start (TanStack Start) instead - @rsc-boundary/core is pulled in automatically."
 ```
 
 ## License

@@ -60,7 +60,7 @@ Pass a single React element as children. For reliable detection prefer a host el
 
 ## Migrating from `rsc-boundary`
 
-Replace the import:
+The unscoped `rsc-boundary` package on npm is **deprecated** — use [`@rsc-boundary/next`](https://www.npmjs.com/package/@rsc-boundary/next) for new work (it includes `@rsc-boundary/core` as a dependency).
 
 ```bash
 pnpm remove rsc-boundary && pnpm add @rsc-boundary/next

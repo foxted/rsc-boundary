@@ -3,13 +3,13 @@ name: install-next
 description: >-
   Installs and wires @rsc-boundary/next into a Next.js App Router app (dependencies,
   root layout provider, optional explicit markers). Use when the user wants to add RSC
-  Boundary, integrate rsc-boundary, or set up server/client boundary devtools in Next.js.
-  The package is @rsc-boundary/next (previously rsc-boundary — see migration note).
+  Boundary, integrate @rsc-boundary/next, or set up server/client boundary devtools in Next.js.
+  The unscoped rsc-boundary package on npm is deprecated — see migration note.
 ---
 
 # Install RSC Boundary in a Next.js app
 
-**Package:** `@rsc-boundary/next` on npm. The legacy `rsc-boundary` package is a back-compat shim that re-exports this package — for new installs always use `@rsc-boundary/next`.
+**Package:** `@rsc-boundary/next` on npm. The unscoped `rsc-boundary` package on npm is **deprecated** — for new projects always install `@rsc-boundary/next` (it pulls in `@rsc-boundary/core` automatically).
 
 ## Prerequisites
 
@@ -36,7 +36,7 @@ yarn add @rsc-boundary/next
 
 ### Migrating from `rsc-boundary`
 
-If the user already has `rsc-boundary` installed, the migration is a one-liner:
+If the user still has the deprecated unscoped `rsc-boundary` package installed, the migration is a one-liner:
 
 ```bash
 pnpm remove rsc-boundary && pnpm add @rsc-boundary/next
