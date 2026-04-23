@@ -62,6 +62,10 @@ import {
 
 Wrap a server-rendered subtree with `<RscServerBoundaryMarker label="MyRegion">` to give it a stable name in the panel instead of the heuristic host-tag label.
 
+The marker uses an `asChild`-style pattern: it does **not** render a wrapper element. Instead it injects `data-rsc-boundary-server="MyRegion"` onto its single child element during development. In production builds it is a pure pass-through — no cloning, no attribute, no extra DOM — so forgetting a marker in production has zero impact on the shipped HTML or CSS.
+
+Pass a single React element as children. For reliable detection prefer a host element (e.g. `<section>`, `<div>`); custom components only propagate the attribute if they spread unknown props onto their root DOM node.
+
 ## Internals filter
 
 The adapter ships with a curated list of TanStack Router / Start internal component names that are excluded from the client-component scan (e.g. `RouterProvider`, `Outlet`, `Match`, `Scripts`). If you spot a TanStack internal still appearing in the panel, [open an issue](https://github.com/foxted/rsc-boundary/issues) with the component name.

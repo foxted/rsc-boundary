@@ -86,11 +86,25 @@ export default function DocsApiPage() {
           <code className="text-lg">RscServerBoundaryMarker</code>
         </h2>
         <p className="mt-2 text-muted">
-          Server Component. Optional wrapper that sets{" "}
-          <code>{`data-rsc-boundary-server`}</code> so devtools list the subtree as an{" "}
+          Server Component. Optional marker that injects{" "}
+          <code>{`data-rsc-boundary-server`}</code> onto its single child element so
+          devtools list the subtree as an{" "}
           <strong className="text-foreground">explicit</strong> server region with your{" "}
-          <code>label</code>. Equivalent to putting the same data attribute on any host
-          element yourself.
+          <code>label</code>. It uses an <code>asChild</code>-style pattern — it does{" "}
+          <strong className="text-foreground">not</strong> render a wrapper element,
+          so your DOM structure is unchanged.
+        </p>
+        <p className="mt-3 text-muted">
+          <strong className="text-foreground">Production:</strong> the marker is a
+          pass-through. No cloning, no attribute, no extra DOM — leaving a marker in
+          a production build has zero impact on the shipped HTML or CSS.
+        </p>
+        <p className="mt-3 text-muted">
+          <strong className="text-foreground">Requirements:</strong> pass a single
+          React element as children. For reliable detection prefer a host element
+          (e.g. <code>&lt;section&gt;</code>, <code>&lt;div&gt;</code>); custom
+          components only propagate the attribute if they spread unknown props onto
+          their root DOM node.
         </p>
         <p className="mt-3 text-muted">
           Constant <code className="text-foreground">SERVER_BOUNDARY_DATA_ATTR</code>{" "}

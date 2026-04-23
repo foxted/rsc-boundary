@@ -21,7 +21,9 @@
 
 import { RSC_DEVTOOLS_DATA_ATTR, SERVER_BOUNDARY_DATA_ATTR } from "./constants";
 import { formatHostFallbackLabel } from "./host-label";
+import { collectDebugServerRegions } from "./rsc-debug-info";
 import type { ClientComponentInfo, FrameworkAdapter, ServerRegionInfo } from "./types";
+import type { FiberWithDom } from "./rsc-debug-info";
 
 // React fiber work tags (numeric constants from React source)
 const FUNCTION_COMPONENT = 0;
@@ -192,17 +194,32 @@ function isInsideDevtools(el: HTMLElement): boolean {
 }
 
 /**
+ * A client component entry paired with its raw fiber for debug-info extraction.
+ *
+ * `fiber` is typed as `unknown` because the internal React Fiber shape is
+ * not part of the public API and may change between React versions.
+ * `getFiberDebugInfo` in rsc-debug-info.ts handles safe access.
+ */
+export interface ClientComponentWithFiber {
+  info: ClientComponentInfo;
+  fiber: unknown;
+}
+
+/**
  * Scan the React fiber tree and return all user-defined client components
- * with their root DOM nodes.
+ * with their root DOM nodes, each paired with the underlying fiber so callers
+ * can read `_debugInfo` for zero-setup Server Component name detection.
  *
  * Server regions combine explicit markers with heuristic DOM outside client
  * subtrees (see getServerRegions).
  */
-export function scanFiberTree(adapter: FrameworkAdapter): ClientComponentInfo[] {
+export function scanFiberTreeWithFibers(
+  adapter: FrameworkAdapter,
+): ClientComponentWithFiber[] {
   const root = findFiberRoot(adapter);
   if (!root) return [];
 
-  const components: ClientComponentInfo[] = [];
+  const components: ClientComponentWithFiber[] = [];
 
   function walk(fiber: Fiber | null): void {
     if (!fiber) return;
@@ -213,7 +230,7 @@ export function scanFiberTree(adapter: FrameworkAdapter): ClientComponentInfo[] 
         (node) => !isInsideDevtools(node),
       );
       if (domNodes.length > 0) {
-        components.push({ name, domNodes });
+        components.push({ info: { name, domNodes }, fiber });
       }
     }
 
@@ -223,6 +240,18 @@ export function scanFiberTree(adapter: FrameworkAdapter): ClientComponentInfo[] 
 
   walk(root.child);
   return components;
+}
+
+/**
+ * Scan the React fiber tree and return all user-defined client components
+ * with their root DOM nodes.
+ *
+ * Thin wrapper around `scanFiberTreeWithFibers` that discards the raw fibers.
+ * Prefer `scanFiberTreeWithFibers` when you also need Server Component name
+ * detection via `_debugInfo`.
+ */
+export function scanFiberTree(adapter: FrameworkAdapter): ClientComponentInfo[] {
+  return scanFiberTreeWithFibers(adapter).map(({ info }) => info);
 }
 
 function isInsideClientBoundary(
@@ -360,26 +389,54 @@ function collectHeuristicServerRegions(
 }
 
 /**
- * Collect server-rendered regions: optional explicit markers plus heuristic
- * nested regions outside client component DOM subtrees.
+ * Collect server-rendered regions: explicit markers, then rsc-debug regions
+ * (from React 19's `_debugInfo`), then heuristic fallback for anything not
+ * already covered.
+ *
+ * Precedence (highest → lowest):
+ *   explicit > rsc-debug > heuristic
+ *
+ * Pass `clientsWithFibers` (from `scanFiberTreeWithFibers`) to enable
+ * zero-setup Server Component name detection. When fibers are not available
+ * (e.g. legacy callers using only `ClientComponentInfo[]`), the rsc-debug
+ * pass is skipped and heuristics fill the gap as before.
  */
 export function getServerRegions(
-  clientComponents: ClientComponentInfo[],
+  clients: ClientComponentInfo[] | ClientComponentWithFiber[],
   adapter: FrameworkAdapter,
   container?: HTMLElement,
 ): ServerRegionInfo[] {
   const root = container ?? adapter.resolveScanContainer() ?? document.body;
 
   const explicit = collectExplicitServerRegions();
-  const explicitRoots = new Set(
-    explicit.map((r) => r.element),
-  );
+  const explicitRoots = new Set(explicit.map((r) => r.element));
+
+  // Determine whether the caller passed the richer fiber-aware array.
+  const hasFibers =
+    clients.length > 0 && "fiber" in (clients[0] as object);
+
+  let debugRegions: ServerRegionInfo[] = [];
+  if (hasFibers) {
+    const fibersWithDom: FiberWithDom[] = (
+      clients as ClientComponentWithFiber[]
+    ).map(({ fiber, info }) => ({ fiber, domNodes: info.domNodes }));
+    debugRegions = collectDebugServerRegions(fibersWithDom);
+  }
+
+  const debugRoots = new Set(debugRegions.map((r) => r.element));
+
+  // Exclude from heuristics any element inside an explicit or debug subtree.
+  const coveredRoots = new Set([...explicitRoots, ...debugRoots]);
+
+  const clientComponents: ClientComponentInfo[] = hasFibers
+    ? (clients as ClientComponentWithFiber[]).map(({ info }) => info)
+    : (clients as ClientComponentInfo[]);
 
   const heuristic = collectHeuristicServerRegions(
     clientComponents,
-    explicitRoots,
+    coveredRoots,
     root,
   );
 
-  return [...explicit, ...heuristic];
+  return [...explicit, ...debugRegions, ...heuristic];
 }

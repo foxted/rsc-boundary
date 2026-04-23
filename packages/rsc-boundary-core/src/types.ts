@@ -10,19 +10,41 @@ export interface ClientComponentInfo {
 }
 
 /** How a server region was detected. */
-export type ServerRegionSource = "explicit" | "heuristic";
+export type ServerRegionSource = "explicit" | "heuristic" | "rsc-debug";
 
 /** Client vs server outline/label kind in devtools overlays. */
 export type HighlightKind = "client" | "server";
 
 /**
- * A highlighted server-rendered DOM region (explicit marker or heuristic).
+ * React 19 DEV-only debug info attached to fibers. Mirrors the internal
+ * ReactComponentInfo shape emitted by the RSC Flight stream (row type "D").
+ * Only present in development builds; must never be relied on in prod paths.
+ */
+export interface ReactComponentInfo {
+  name: string;
+  env?: "Server" | "Client";
+  key?: string | null;
+  owner?: ReactComponentInfo | null;
+}
+
+/**
+ * A highlighted server-rendered DOM region (explicit marker, rsc-debug, or heuristic).
  */
 export interface ServerRegionInfo {
   element: HTMLElement;
   /** Label for panel and floating overlay */
   displayLabel: string;
   source: ServerRegionSource;
+  /**
+   * The real Server Component name when source is "rsc-debug".
+   * May differ from displayLabel if the label has been customised.
+   */
+  componentName?: string;
+  /**
+   * Environment badge from React's _debugInfo (e.g. "Server").
+   * Only present when source is "rsc-debug".
+   */
+  env?: "Server" | "Client";
 }
 
 export interface HighlightState {

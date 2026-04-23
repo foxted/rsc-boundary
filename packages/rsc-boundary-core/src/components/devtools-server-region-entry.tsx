@@ -5,8 +5,21 @@ interface ServerRegionEntryProps {
   region: ServerRegionInfo;
 }
 
+function provenanceLabel(source: ServerRegionInfo["source"]): string {
+  if (source === "explicit") return "explicit";
+  if (source === "rsc-debug") return "rsc";
+  return "~";
+}
+
+function provenanceColor(source: ServerRegionInfo["source"]): string {
+  if (source === "explicit") return "rgba(147, 197, 253, 0.95)";
+  if (source === "rsc-debug") return "rgba(134, 239, 172, 0.9)";
+  return "rgba(255,255,255,0.45)";
+}
+
 export function ServerRegionEntry({ region }: ServerRegionEntryProps) {
-  const provenance = region.source === "explicit" ? "explicit" : "~";
+  const provenance = provenanceLabel(region.source);
+  const color = provenanceColor(region.source);
   return (
     <div
       style={{
@@ -36,10 +49,7 @@ export function ServerRegionEntry({ region }: ServerRegionEntryProps) {
           fontWeight: 600,
           letterSpacing: "0.02em",
           textTransform: "uppercase",
-          color:
-            region.source === "explicit"
-              ? "rgba(147, 197, 253, 0.95)"
-              : "rgba(255,255,255,0.45)",
+          color,
         }}
       >
         {provenance}
@@ -52,6 +62,24 @@ export function ServerRegionEntry({ region }: ServerRegionEntryProps) {
       >
         {region.displayLabel}
       </span>
+      {region.source === "rsc-debug" && region.env && (
+        <span
+          style={{
+            marginLeft: "auto",
+            fontSize: 8,
+            fontWeight: 700,
+            letterSpacing: "0.04em",
+            textTransform: "uppercase",
+            padding: "1px 4px",
+            borderRadius: 3,
+            background: "rgba(134, 239, 172, 0.15)",
+            color: "rgba(134, 239, 172, 0.85)",
+            flexShrink: 0,
+          }}
+        >
+          {region.env}
+        </span>
+      )}
     </div>
   );
 }

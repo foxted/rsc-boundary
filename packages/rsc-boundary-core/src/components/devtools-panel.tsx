@@ -95,8 +95,10 @@ export function Panel({ clientComponents, serverRegions }: PanelProps) {
           }}
         >
           Server:{" "}
-          <span style={{ color: "rgba(255,255,255,0.65)" }}>explicit</span>{" "}
-          (marker) vs{" "}
+          <span style={{ color: "rgba(147, 197, 253, 0.95)" }}>explicit</span>{" "}
+          (marker) ·{" "}
+          <span style={{ color: "rgba(134, 239, 172, 0.9)" }}>rsc</span>{" "}
+          (debug info) ·{" "}
           <span style={{ color: "rgba(255,255,255,0.65)" }}>~</span>{" "}
           (heuristic).
         </div>

@@ -27,7 +27,7 @@ import {
 } from "react";
 
 import type { ClientComponentInfo, FrameworkAdapter, ServerRegionInfo } from "../types";
-import { scanFiberTree, getServerRegions } from "../fiber-utils";
+import { scanFiberTreeWithFibers, getServerRegions } from "../fiber-utils";
 import {
   applyHighlights,
   removeHighlights,
@@ -51,8 +51,9 @@ export function RscDevtools({ adapter }: RscDevtoolsProps) {
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const scan = useCallback(() => {
-    const nextClientComponents = scanFiberTree(adapter);
-    const nextServerRegions = getServerRegions(nextClientComponents, adapter);
+    const clientsWithFibers = scanFiberTreeWithFibers(adapter);
+    const nextClientComponents = clientsWithFibers.map(({ info }) => info);
+    const nextServerRegions = getServerRegions(clientsWithFibers, adapter);
     applyHighlights(nextClientComponents, nextServerRegions);
     setClientComponents((prev) =>
       clientComponentListEqual(prev, nextClientComponents)

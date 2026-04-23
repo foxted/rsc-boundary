@@ -30,19 +30,17 @@ export default function HomePage() {
             </section>
           </RscServerBoundaryMarker>
 
-          {/* ── Stats bar (server) ────────────────────────── */}
-          <RscServerBoundaryMarker label="StatsBar">
-            <div className="stats-bar">
-              {Object.entries(siteStats).map(([key, val]) => (
-                <div key={key}>
-                  <div className="stat-value">{val}</div>
-                  <div className="stat-label">
-                    {key.charAt(0).toUpperCase() + key.slice(1)}
-                  </div>
+          {/* ── Stats bar (server) — no explicit marker; detected via _debugInfo ── */}
+          <div className="stats-bar">
+            {Object.entries(siteStats).map(([key, val]) => (
+              <div key={key}>
+                <div className="stat-value">{val}</div>
+                <div className="stat-label">
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
                 </div>
-              ))}
-            </div>
-          </RscServerBoundaryMarker>
+              </div>
+            ))}
+          </div>
 
           {/* ── Search bar (client) ───────────────────────── */}
           <SearchBar articles={articles} />
