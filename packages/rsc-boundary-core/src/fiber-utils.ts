@@ -25,6 +25,23 @@ import { collectDebugServerRegions } from "./rsc-debug-info";
 import type { ClientComponentInfo, FrameworkAdapter, ServerRegionInfo } from "./types";
 import type { FiberWithDom } from "./rsc-debug-info";
 
+/**
+ * Standard HTML elements that are never visual server regions.
+ * Excludes them from heuristic detection to avoid noisy panel entries for
+ * injected scripts, stylesheets, and other infrastructure tags.
+ */
+const NON_VISUAL_TAGS = new Set([
+  "SCRIPT",
+  "STYLE",
+  "LINK",
+  "META",
+  "TEMPLATE",
+  "NOSCRIPT",
+  "HEAD",
+  "TITLE",
+  "BASE",
+]);
+
 // React fiber work tags (numeric constants from React source)
 const FUNCTION_COMPONENT = 0;
 const CLASS_COMPONENT = 1;
@@ -357,6 +374,7 @@ function collectHeuristicServerRegions(
     if (el === container) return false;
     if (!container.contains(el)) return false;
     if (isInsideDevtools(el)) return false;
+    if (NON_VISUAL_TAGS.has(el.tagName)) return false;
     if (isInsideClientBoundary(el, clientRoots)) return false;
     if (isInsideExplicitMarkerSubtree(el, explicitMarkerElements)) return false;
     return true;
@@ -420,7 +438,7 @@ export function getServerRegions(
     const fibersWithDom: FiberWithDom[] = (
       clients as ClientComponentWithFiber[]
     ).map(({ fiber, info }) => ({ fiber, domNodes: info.domNodes }));
-    debugRegions = collectDebugServerRegions(fibersWithDom);
+    debugRegions = collectDebugServerRegions(fibersWithDom, adapter.internals);
   }
 
   const debugRoots = new Set(debugRegions.map((r) => r.element));

@@ -6,6 +6,7 @@ import {
   collectDebugServerRegions,
   computeLCA,
   getFiberDebugInfo,
+  isReactComponentInfo,
 } from "./rsc-debug-info";
 import type { FiberWithDom } from "./rsc-debug-info";
 import type { ReactComponentInfo } from "./types";
@@ -37,8 +38,50 @@ describe("getFiberDebugInfo", () => {
     expect(getFiberDebugInfo({ _debugInfo: info })).toBe(info);
   });
 
+  it("returns the raw array unfiltered (callers must narrow with isReactComponentInfo)", () => {
+    // Simulate a mixed _debugInfo with non-component entries (ReactTimeInfo, ReactEnvironmentInfo).
+    const mixed = [{ name: "Page", env: "Server" }, { env: "edge" }, { time: 123 }];
+    expect(getFiberDebugInfo({ _debugInfo: mixed })).toBe(mixed);
+  });
+
   it("returns an empty array without throwing", () => {
     expect(getFiberDebugInfo({ _debugInfo: [] })).toEqual([]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isReactComponentInfo
+// ---------------------------------------------------------------------------
+
+describe("isReactComponentInfo", () => {
+  it("returns true for objects with a string name", () => {
+    expect(isReactComponentInfo({ name: "Page", env: "Server" })).toBe(true);
+    expect(isReactComponentInfo({ name: "Layout" })).toBe(true);
+  });
+
+  it("returns false for ReactEnvironmentInfo (env only, no name)", () => {
+    expect(isReactComponentInfo({ env: "edge" })).toBe(false);
+  });
+
+  it("returns false for ReactTimeInfo (time only)", () => {
+    expect(isReactComponentInfo({ time: 123 })).toBe(false);
+  });
+
+  it("returns false for ReactAsyncInfo (type/awaited only)", () => {
+    expect(isReactComponentInfo({ type: "async" })).toBe(false);
+    expect(isReactComponentInfo({ awaited: {} })).toBe(false);
+  });
+
+  it("returns false for non-objects", () => {
+    expect(isReactComponentInfo(null)).toBe(false);
+    expect(isReactComponentInfo(undefined)).toBe(false);
+    expect(isReactComponentInfo("Page")).toBe(false);
+    expect(isReactComponentInfo(42)).toBe(false);
+  });
+
+  it("returns false when name is not a string", () => {
+    expect(isReactComponentInfo({ name: 42 })).toBe(false);
+    expect(isReactComponentInfo({ name: null })).toBe(false);
   });
 });
 
@@ -196,17 +239,59 @@ describe("collectDebugServerRegions", () => {
     expect(regions[0]?.element).toBe(container);
   });
 
-  it("merges by string key when objects differ but represent the same component", () => {
-    // Two separate objects with the same name + owner chain (no owner here).
-    const a: ReactComponentInfo = { name: "Stats" };
-    const b: ReactComponentInfo = { name: "Stats" };
+  it("emits two regions for two different ReactComponentInfo objects with the same name", () => {
+    // Different object identity = different SC instances (e.g. two <Article> list items).
+    // String-key merging would incorrectly collapse these into one region whose
+    // LCA might be a distant ancestor — object identity is the right discriminator.
+    const a: ReactComponentInfo = { name: "Article" };
+    const b: ReactComponentInfo = { name: "Article" };
     const el1 = document.createElement("div");
     const el2 = document.createElement("div");
     container.append(el1, el2);
     const fibers = [makeFiber([a], [el1]), makeFiber([b], [el2])];
     const regions = collectDebugServerRegions(fibers);
+    expect(regions).toHaveLength(2);
+    const labels = regions.map((r) => r.displayLabel);
+    expect(labels).toEqual(["Article", "Article"]);
+    // Each region anchors to its own element, not a shared ancestor.
+    const elements = regions.map((r) => r.element);
+    expect(elements).toContain(el1);
+    expect(elements).toContain(el2);
+  });
+
+  it("ignores non-component _debugInfo entries (ReactTimeInfo, ReactEnvironmentInfo, ReactAsyncInfo)", () => {
+    const el = makeEl();
+    const fibers: FiberWithDom[] = [
+      {
+        fiber: {
+          _debugInfo: [
+            { time: 123 },          // ReactTimeInfo — no name
+            { env: "edge" },        // ReactEnvironmentInfo — no name
+            { awaited: {} },        // ReactAsyncInfo-like — no name
+            { name: "Page", env: "Server" as const }, // valid ReactComponentInfo
+          ],
+        },
+        domNodes: [el],
+      },
+    ];
+    const regions = collectDebugServerRegions(fibers);
     expect(regions).toHaveLength(1);
-    expect(regions[0]?.displayLabel).toBe("Stats");
+    expect(regions[0]?.displayLabel).toBe("Page");
+  });
+
+  it("filters out names present in the internals set", () => {
+    const el1 = makeEl();
+    const el2 = makeEl();
+    const internal: ReactComponentInfo = { name: "LayoutRouter", env: "Server" };
+    const user: ReactComponentInfo = { name: "HeroSection", env: "Server" };
+    const fibers = [
+      makeFiber([internal], [el1]),
+      makeFiber([user], [el2]),
+    ];
+    const internals = new Set(["LayoutRouter"]);
+    const regions = collectDebugServerRegions(fibers, internals);
+    expect(regions).toHaveLength(1);
+    expect(regions[0]?.displayLabel).toBe("HeroSection");
   });
 
   it("skips fibers with empty domNodes", () => {

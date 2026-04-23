@@ -176,6 +176,28 @@ describe("getServerRegions", () => {
     }
   });
 
+  // ---------------------------------------------------------------------------
+  // Non-visual tag filtering
+  // ---------------------------------------------------------------------------
+
+  it("excludes non-visual elements (script, style, link, meta, etc.) from heuristic regions", () => {
+    const next = document.getElementById("__next")!;
+    const visible = document.createElement("section");
+    const script = document.createElement("script");
+    const style = document.createElement("style");
+    const link = document.createElement("link");
+    const meta = document.createElement("meta");
+    const noscript = document.createElement("noscript");
+    const template = document.createElement("template");
+    next.append(visible, script, style, link, meta, noscript, template);
+
+    const regions = getServerRegions([], testAdapter);
+    const heuristic = regions.filter((r) => r.source === "heuristic");
+    // Only the visible <section> should appear; infrastructure tags are excluded.
+    expect(heuristic).toHaveLength(1);
+    expect(heuristic[0]?.element).toBe(visible);
+  });
+
   it("passes ClientComponentInfo[] (no fibers) without errors — backwards compat", () => {
     const next = document.getElementById("__next")!;
     // serverEl and clientEl are siblings so serverEl is a heuristic server region.
