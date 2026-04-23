@@ -7,6 +7,20 @@ import {
   SERVER_BOUNDARY_DATA_ATTR,
 } from "./constants";
 import { getServerRegions } from "./fiber-utils";
+import type { FrameworkAdapter } from "./types";
+
+/** Minimal adapter that mimics Next.js-style root detection for tests. */
+const testAdapter: FrameworkAdapter = {
+  name: "test",
+  internals: new Set(),
+  rootCandidates: () => [
+    document.getElementById("__next"),
+    document.body,
+    document.documentElement,
+  ],
+  resolveScanContainer: () =>
+    document.getElementById("__next") ?? document.body,
+};
 
 describe("getServerRegions", () => {
   beforeEach(() => {
@@ -23,7 +37,7 @@ describe("getServerRegions", () => {
     outer.append(inner);
     next.append(outer);
 
-    const regions = getServerRegions([]);
+    const regions = getServerRegions([], testAdapter);
     const heuristic = regions.filter((r) => r.source === "heuristic");
     expect(heuristic).toHaveLength(1);
     expect(heuristic[0]?.element).toBe(outer);
@@ -38,9 +52,10 @@ describe("getServerRegions", () => {
     const aside = document.createElement("aside");
     next.append(section, aside);
 
-    const regions = getServerRegions([
-      { name: "ClientCmp", domNodes: [clientRoot] },
-    ]);
+    const regions = getServerRegions(
+      [{ name: "ClientCmp", domNodes: [clientRoot] }],
+      testAdapter,
+    );
     const heuristic = regions.filter((r) => r.source === "heuristic");
     expect(heuristic).toHaveLength(1);
     expect(heuristic[0]?.element).toBe(aside);
@@ -52,7 +67,7 @@ describe("getServerRegions", () => {
     el.setAttribute(SERVER_BOUNDARY_DATA_ATTR, "MyRegion");
     next.append(el);
 
-    const regions = getServerRegions([]);
+    const regions = getServerRegions([], testAdapter);
     expect(regions).toHaveLength(1);
     expect(regions[0]).toMatchObject({
       source: "explicit",
@@ -67,7 +82,7 @@ describe("getServerRegions", () => {
     el.setAttribute(SERVER_BOUNDARY_DATA_ATTR, "");
     next.append(el);
 
-    const regions = getServerRegions([]);
+    const regions = getServerRegions([], testAdapter);
     expect(regions).toHaveLength(1);
     expect(regions[0]?.source).toBe("explicit");
     expect(regions[0]?.displayLabel).toBe("<p>");
@@ -82,7 +97,7 @@ describe("getServerRegions", () => {
     shell.append(marked);
     next.append(shell);
 
-    const regions = getServerRegions([]);
+    const regions = getServerRegions([], testAdapter);
     expect(regions.filter((r) => r.source === "explicit")).toHaveLength(0);
   });
 });

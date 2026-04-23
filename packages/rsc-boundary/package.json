@@ -1,8 +1,9 @@
 {
   "name": "rsc-boundary",
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "module",
   "license": "MIT",
+  "description": "Back-compat shim — re-exports @rsc-boundary/next. Prefer @rsc-boundary/next for new projects.",
   "repository": {
     "type": "git",
     "url": "https://github.com/foxted/rsc-boundary.git"
@@ -27,7 +28,11 @@
     "test": "vitest run"
   },
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "provenance": true
+  },
+  "dependencies": {
+    "@rsc-boundary/next": "workspace:*"
   },
   "peerDependencies": {
     "next": "^16.0.0",
@@ -46,7 +51,6 @@
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "eslint": "^9.39.1",
-    "jsdom": "^26.1.0",
     "typescript": "6.0.2",
     "vitest": "^3.2.4"
   }

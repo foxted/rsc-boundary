@@ -13,11 +13,15 @@
  *
  * This approach mirrors what React DevTools does internally — it accesses the
  * __reactFiber$* property that React attaches to DOM elements during hydration.
+ *
+ * Framework-specific configuration (internal component names, root element
+ * candidates) is supplied via the `FrameworkAdapter` interface so this module
+ * stays framework-agnostic.
  */
 
 import { RSC_DEVTOOLS_DATA_ATTR, SERVER_BOUNDARY_DATA_ATTR } from "./constants";
 import { formatHostFallbackLabel } from "./host-label";
-import type { ClientComponentInfo, ServerRegionInfo } from "./types";
+import type { ClientComponentInfo, FrameworkAdapter, ServerRegionInfo } from "./types";
 
 // React fiber work tags (numeric constants from React source)
 const FUNCTION_COMPONENT = 0;
@@ -33,43 +37,6 @@ const COMPONENT_TAGS = new Set([
   FORWARD_REF,
   MEMO_COMPONENT,
   SIMPLE_MEMO_COMPONENT,
-]);
-
-/**
- * Next.js internal client component names to filter out.
- * These are framework components that appear in the fiber tree but are not
- * user-authored — highlighting them would add noise rather than insight.
- */
-const NEXT_INTERNALS = new Set([
-  "AppRouter",
-  "HotReload",
-  "Router",
-  "LayoutRouter",
-  "InnerLayoutRouter",
-  "OuterLayoutRouter",
-  "RenderFromTemplateContext",
-  "ErrorBoundary",
-  "ErrorBoundaryHandler",
-  "GlobalError",
-  "RedirectBoundary",
-  "RedirectErrorBoundary",
-  "NotFoundBoundary",
-  "NotFoundErrorBoundary",
-  "LoadingBoundary",
-  "ScrollAndFocusHandler",
-  "InnerScrollAndFocusHandler",
-  "RootLayoutBoundary",
-  "RootErrorBoundary",
-  "ReactDevOverlay",
-  "DevToolsIndicator",
-  "DevRootNotFoundBoundary",
-  "MetadataBoundary",
-  "ViewportBoundary",
-  "OutletBoundary",
-  "HTTPAccessFallbackBoundary",
-  "HTTPAccessErrorBoundary",
-  // Our own devtools root components (sub-components filtered via DOM check)
-  "RscDevtools",
 ]);
 
 /**
@@ -150,11 +117,11 @@ function getComponentName(fiber: Fiber): string | null {
   return null;
 }
 
-function isUserComponent(fiber: Fiber): boolean {
+function isUserComponent(fiber: Fiber, adapter: FrameworkAdapter): boolean {
   if (!COMPONENT_TAGS.has(fiber.tag)) return false;
   const name = getComponentName(fiber);
   if (!name) return false;
-  if (NEXT_INTERNALS.has(name)) return false;
+  if (adapter.internals.has(name)) return false;
   return true;
 }
 
@@ -163,7 +130,7 @@ function isUserComponent(fiber: Fiber): boolean {
  * Stops at the first HostComponent layer — does not recurse into
  * child components.
  */
-function getRootDomNodes(fiber: Fiber): HTMLElement[] {
+function getRootDomNodes(fiber: Fiber, adapter: FrameworkAdapter): HTMLElement[] {
   const nodes: HTMLElement[] = [];
 
   function collect(f: Fiber | null): void {
@@ -174,7 +141,7 @@ function getRootDomNodes(fiber: Fiber): HTMLElement[] {
     }
     // Skip into child component fibers but only collect their DOM if
     // they are NOT themselves user components (which get their own entry).
-    if (COMPONENT_TAGS.has(f.tag) && f !== fiber && isUserComponent(f)) {
+    if (COMPONENT_TAGS.has(f.tag) && f !== fiber && isUserComponent(f, adapter)) {
       return; // this child component will be reported separately
     }
     collect(f.child);
@@ -186,16 +153,10 @@ function getRootDomNodes(fiber: Fiber): HTMLElement[] {
 }
 
 /**
- * Find the fiber root by starting at a DOM element and walking up.
+ * Find the fiber root by trying each candidate in the adapter's list.
  */
-function findFiberRoot(): Fiber | null {
-  const candidates = [
-    document.getElementById("__next"),
-    document.body,
-    document.documentElement,
-  ];
-
-  for (const el of candidates) {
+function findFiberRoot(adapter: FrameworkAdapter): Fiber | null {
+  for (const el of adapter.rootCandidates()) {
     if (!el) continue;
     const raw = getFiber(el);
     if (!isFiber(raw)) continue;
@@ -237,8 +198,8 @@ function isInsideDevtools(el: HTMLElement): boolean {
  * Server regions combine explicit markers with heuristic DOM outside client
  * subtrees (see getServerRegions).
  */
-export function scanFiberTree(): ClientComponentInfo[] {
-  const root = findFiberRoot();
+export function scanFiberTree(adapter: FrameworkAdapter): ClientComponentInfo[] {
+  const root = findFiberRoot(adapter);
   if (!root) return [];
 
   const components: ClientComponentInfo[] = [];
@@ -246,9 +207,9 @@ export function scanFiberTree(): ClientComponentInfo[] {
   function walk(fiber: Fiber | null): void {
     if (!fiber) return;
 
-    if (isUserComponent(fiber)) {
+    if (isUserComponent(fiber, adapter)) {
       const name = getComponentName(fiber) ?? "Anonymous";
-      const domNodes = getRootDomNodes(fiber).filter(
+      const domNodes = getRootDomNodes(fiber, adapter).filter(
         (node) => !isInsideDevtools(node),
       );
       if (domNodes.length > 0) {
@@ -404,9 +365,10 @@ function collectHeuristicServerRegions(
  */
 export function getServerRegions(
   clientComponents: ClientComponentInfo[],
+  adapter: FrameworkAdapter,
   container?: HTMLElement,
 ): ServerRegionInfo[] {
-  const root = container ?? document.getElementById("__next") ?? document.body;
+  const root = container ?? adapter.resolveScanContainer() ?? document.body;
 
   const explicit = collectExplicitServerRegions();
   const explicitRoots = new Set(

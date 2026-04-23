@@ -10,7 +10,7 @@ concurrency: ${{ github.workflow }}-${{ github.ref }}
 permissions:
   contents: write
   pull-requests: write
-  id-token: write
+  id-token: write  # required for npm provenance attestation
 
 jobs:
   release:
@@ -56,3 +56,9 @@ jobs:
           title: "chore: version packages"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # NPM_TOKEN must be added to the repository secrets by a maintainer.
+          # The token must have publish access to the @rsc-boundary npm scope
+          # and the rsc-boundary package. Create it at https://www.npmjs.com/settings/tokens
+          # (type: "Automation") and add it as a secret named NPM_TOKEN.
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -4,14 +4,18 @@
  * RscDevtools — floating overlay for visualizing RSC boundaries.
  *
  * Renders a small pill-shaped toggle (bottom-left, visually complementing
- * the Next.js dev indicator) that, when activated, scans the React fiber
- * tree to find all client components, highlights them with orange outlines,
- * and shows server regions in blue.
+ * the Next.js / TanStack Start dev indicator) that, when activated, scans
+ * the React fiber tree to find all client components, highlights them with
+ * orange outlines, and shows server regions in blue.
  *
  * A companion panel lists detected components with counts and a legend.
  *
  * This component is client-only ("use client"). Mounting is controlled by
- * `RscBoundaryProvider` (development only).
+ * the per-framework `RscBoundaryProvider` (development only).
+ *
+ * The `adapter` prop provides framework-specific configuration: which
+ * component names to treat as framework internals and how to find the
+ * React fiber root.
  */
 
 import {
@@ -22,7 +26,7 @@ import {
   type MouseEvent,
 } from "react";
 
-import type { ClientComponentInfo, ServerRegionInfo } from "../types";
+import type { ClientComponentInfo, FrameworkAdapter, ServerRegionInfo } from "../types";
 import { scanFiberTree, getServerRegions } from "../fiber-utils";
 import {
   applyHighlights,
@@ -33,7 +37,11 @@ import { clientComponentListEqual, serverRegionsEqual } from "./devtools-compare
 import { Panel } from "./devtools-panel";
 import { Pill } from "./devtools-pill";
 
-export function RscDevtools() {
+export interface RscDevtoolsProps {
+  adapter: FrameworkAdapter;
+}
+
+export function RscDevtools({ adapter }: RscDevtoolsProps) {
   const [active, setActive] = useState(false);
   const [panelOpen, setPanelOpen] = useState(false);
   const [clientComponents, setClientComponents] = useState<
@@ -43,8 +51,8 @@ export function RscDevtools() {
   const cleanupRef = useRef<(() => void) | null>(null);
 
   const scan = useCallback(() => {
-    const nextClientComponents = scanFiberTree();
-    const nextServerRegions = getServerRegions(nextClientComponents);
+    const nextClientComponents = scanFiberTree(adapter);
+    const nextServerRegions = getServerRegions(nextClientComponents, adapter);
     applyHighlights(nextClientComponents, nextServerRegions);
     setClientComponents((prev) =>
       clientComponentListEqual(prev, nextClientComponents)
@@ -54,7 +62,7 @@ export function RscDevtools() {
     setServerRegions((prev) =>
       serverRegionsEqual(prev, nextServerRegions) ? prev : nextServerRegions,
     );
-  }, []);
+  }, [adapter]);
 
   const activate = useCallback(() => {
     // Delay scan slightly to let React finish any pending renders

@@ -1,12 +1,8 @@
-export { SERVER_BOUNDARY_DATA_ATTR } from "./constants";
-export { COLORS, LABEL_BASE_STYLES } from "./styles";
-export type {
-  ClientComponentInfo,
-  HighlightKind,
-  HighlightState,
-  ServerRegionInfo,
-  ServerRegionSource,
-} from "./types";
-export { RscBoundaryProvider } from "./components/provider";
-export { RscDevtools } from "./components/rsc-devtools";
-export { RscServerBoundaryMarker } from "./components/server-boundary-marker";
+/**
+ * Back-compatibility shim — re-exports everything from `@rsc-boundary/next`.
+ *
+ * If you are starting a new project, prefer importing directly from
+ * `@rsc-boundary/next` (or `@rsc-boundary/start` for TanStack Start).
+ * This package will be deprecated in a future major release.
+ */
+export * from "@rsc-boundary/next";
