@@ -4,10 +4,10 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev --ui tui",
-    "lint": "turbo run lint",
+    "lint": "turbo run lint --log-order grouped --concurrency=100%",
     "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types",
-    "test": "turbo run test",
+    "check-types": "turbo run check-types --log-order grouped --concurrency=100%",
+    "test": "turbo run test --log-order grouped --concurrency=100%",
     "changeset": "changeset",
     "version-packages": "changeset version",
     "release": "turbo run build --filter='./packages/*' && changeset publish"
