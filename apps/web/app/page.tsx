@@ -2,16 +2,47 @@ import { GitBranch, Shield, Zap } from "lucide-react";
 import Link from "next/link";
 import { CodeBlock } from "../components/code-block";
 import { FeatureCard } from "../components/feature-card";
+import { FrameworkTabs } from "../components/framework-tabs";
 import { HeroToolSurface } from "../components/hero-tool-surface";
 import { PackageInstall } from "../components/package-install";
 
-const layoutSnippet = `import { RscBoundaryProvider } from "rsc-boundary";
+const layoutSnippetNext = `import { RscBoundaryProvider } from "@rsc-boundary/next";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
         <RscBoundaryProvider>{children}</RscBoundaryProvider>
+      </body>
+    </html>
+  );
+}`;
+
+const layoutSnippetStart = `import type { ReactNode } from "react";
+import { createRootRoute, Outlet, Scripts, HeadContent } from "@tanstack/react-router";
+import { RscBoundaryProvider } from "@rsc-boundary/start";
+
+export const Route = createRootRoute({
+  component: RootComponent,
+});
+
+function RootComponent() {
+  return (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  );
+}
+
+function RootDocument({ children }: { children: ReactNode }) {
+  return (
+    <html lang="en">
+      <head>
+        <HeadContent />
+      </head>
+      <body>
+        <RscBoundaryProvider>{children}</RscBoundaryProvider>
+        <Scripts />
       </body>
     </html>
   );
@@ -28,7 +59,7 @@ export default function HomePage() {
         <div className="mx-auto w-full max-w-3xl text-center">
           <HeroToolSurface kind="server" name="app/page.tsx">
             <p className="text-sm font-medium text-accent">
-              Next.js App Router · React 19
+              Next.js App Router · TanStack Start · React 19
             </p>
             <h1
               id="hero-heading"
@@ -61,7 +92,32 @@ export default function HomePage() {
         <aside className="mx-auto w-full max-w-xl">
           <HeroToolSurface kind="client" name="PackageInstallClient">
             <h2 className="sr-only">Install</h2>
-            <PackageInstall />
+            <FrameworkTabs
+              label="Package to install"
+              next={
+                <PackageInstall
+                  embedded
+                  packageName="@rsc-boundary/next"
+                />
+              }
+              start={
+                <PackageInstall
+                  embedded
+                  packageName="@rsc-boundary/start"
+                />
+              }
+            />
+            <p className="mt-3 text-center text-xs text-muted">
+              The legacy{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-[0.7rem]">
+                rsc-boundary
+              </code>{" "}
+              package re-exports{" "}
+              <code className="rounded bg-muted px-1 py-0.5 text-[0.7rem]">
+                @rsc-boundary/next
+              </code>
+              ; prefer the scoped packages for new work.
+            </p>
           </HeroToolSurface>
         </aside>
       </section>
@@ -90,8 +146,24 @@ export default function HomePage() {
           Add the provider around your app body. That&apos;s the entire
           integration.
         </p>
-        <div className="mt-6">
-          <CodeBlock code={layoutSnippet} filename="app/layout.tsx" />
+        <div className="mt-6 not-prose">
+          <FrameworkTabs
+            label="Root wiring"
+            next={
+              <CodeBlock
+                embedded
+                code={layoutSnippetNext}
+                filename="app/layout.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={layoutSnippetStart}
+                filename="app/routes/__root.tsx"
+              />
+            }
+          />
         </div>
       </section>
     </main>

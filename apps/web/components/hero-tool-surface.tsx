@@ -2,7 +2,7 @@ import {
   COLORS,
   LABEL_BASE_STYLES,
   type ServerRegionSource,
-} from "rsc-boundary";
+} from "@rsc-boundary/next";
 import type { CSSProperties, ReactNode } from "react";
 
 interface HeroToolSurfaceProps {

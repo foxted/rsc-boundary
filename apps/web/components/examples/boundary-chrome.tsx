@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { COLORS } from "rsc-boundary";
+import { COLORS } from "@rsc-boundary/next";
 
 /**
  * Static outlines that mimic development devtools (this site does not ship

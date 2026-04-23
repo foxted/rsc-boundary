@@ -4,9 +4,9 @@
  * When active, this module:
  * 1. Takes the list of client components (from fiber-utils) and applies
  *    orange dashed outlines to their root DOM elements.
- * 2. Identifies server regions (explicit markers and/or heuristic DOM outside
- *    client subtrees) and applies blue dashed outlines.
- * 3. Injects small floating labels (client name; server label + explicit vs ~).
+ * 2. Identifies server regions (explicit, rsc-debug, heuristic) and applies blue
+ *    dashed outlines.
+ * 3. Injects small floating labels (client name; server label + explicit / rsc / ~).
  * 4. Sets up a MutationObserver to re-scan when the DOM changes
  *    (e.g. route navigation, lazy-loaded content).
  *

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { CopyButton } from "./copy-button";
 import { ShikiThemedHtml } from "./shiki-themed-html";
 
-type Manager = "pnpm" | "npm" | "yarn";
+type Manager = "pnpm" | "npm" | "yarn" | "bun";
 
 interface ThemedHtml {
   light: string;
@@ -14,22 +14,30 @@ interface ThemedHtml {
 interface PackageInstallClientProps {
   commands: Record<Manager, string>;
   html: Record<Manager, ThemedHtml>;
+  /** When true, omit outer border and radius (e.g. inside FrameworkTabs). */
+  embedded?: boolean;
 }
 
 const TABS: { id: Manager; label: string }[] = [
   { id: "pnpm", label: "pnpm" },
   { id: "npm", label: "npm" },
   { id: "yarn", label: "yarn" },
+  { id: "bun", label: "bun" },
 ];
 
 export function PackageInstallClient({
   commands,
   html,
+  embedded = false,
 }: PackageInstallClientProps) {
   const [manager, setManager] = useState<Manager>("pnpm");
 
+  const shellClass = embedded
+    ? "overflow-hidden bg-zinc-50 dark:bg-zinc-950"
+    : "overflow-hidden rounded-xl border border-border bg-zinc-50 dark:bg-zinc-950";
+
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-zinc-50 dark:bg-zinc-950">
+    <div className={shellClass}>
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-3 py-2">
         <div
           className="flex flex-wrap gap-1"

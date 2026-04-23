@@ -13,6 +13,8 @@ export function formatDevtoolsLabelCaption(
       ? "Client"
       : serverSource === "explicit"
         ? "Server (explicit)"
-        : "Server (~)";
+        : serverSource === "rsc-debug"
+          ? "Server (rsc)"
+          : "Server (~)";
   return `${prefix}: ${name}`;
 }

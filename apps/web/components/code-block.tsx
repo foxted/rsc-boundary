@@ -12,15 +12,28 @@ interface CodeBlockProps {
   filename?: string;
   /** Grammar for highlighting; defaults from `filename` extension or tsx */
   lang?: CodeLang;
+  /**
+   * When true, omit outer border and radius (for use inside {@link FrameworkTabs}).
+   */
+  embedded?: boolean;
 }
 
-export async function CodeBlock({ code, filename, lang }: CodeBlockProps) {
+export async function CodeBlock({
+  code,
+  filename,
+  lang,
+  embedded = false,
+}: CodeBlockProps) {
   const trimmed = code.trimEnd();
   const resolvedLang = lang ?? langFromFilename(filename);
   const { light, dark } = await highlightCodeThemedPair(trimmed, resolvedLang);
 
+  const shellClass = embedded
+    ? "overflow-hidden bg-zinc-50 dark:bg-zinc-950"
+    : "overflow-hidden rounded-xl border border-border bg-zinc-50 dark:bg-zinc-950";
+
   return (
-    <div className="overflow-hidden rounded-xl border border-border bg-zinc-50 dark:bg-zinc-950">
+    <div className={shellClass}>
       <div className="flex items-center justify-between gap-2 border-b border-border px-3 py-2">
         <span className="min-w-0 truncate font-mono text-xs text-muted">
           {filename ?? "\u00a0"}

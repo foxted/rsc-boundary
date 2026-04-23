@@ -21,6 +21,12 @@ describe("formatDevtoolsLabelCaption", () => {
     );
   });
 
+  it("labels rsc-debug server regions", () => {
+    expect(
+      formatDevtoolsLabelCaption("Article", "server", "rsc-debug"),
+    ).toBe("Server (rsc): Article");
+  });
+
   it("treats missing server source as heuristic wording", () => {
     expect(formatDevtoolsLabelCaption("X", "server")).toBe("Server (~): X");
   });

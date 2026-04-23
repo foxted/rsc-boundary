@@ -23,6 +23,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@rsc-boundary/next':
+        specifier: workspace:*
+        version: link:../../packages/rsc-boundary-next
       '@vercel/analytics':
         specifier: ^2.0.1
         version: 2.0.1(next@16.2.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4))(react@19.2.4)
@@ -38,9 +41,6 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
-      rsc-boundary:
-        specifier: workspace:*
-        version: link:../../packages/rsc-boundary
       shiki:
         specifier: ^4.0.2
         version: 4.0.2

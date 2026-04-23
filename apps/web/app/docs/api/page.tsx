@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { CodeBlock } from "../../../components/code-block";
+import { FrameworkTabs } from "../../../components/framework-tabs";
 
 export const metadata: Metadata = {
   title: "API reference",
-  description: "RscBoundaryProvider and RscDevtools API for RSC Boundary.",
+  description:
+    "RscBoundaryProvider, adapters, and RSC Boundary API for Next.js and TanStack Start.",
 };
 
-const importSnippet = `import {
+const importSnippetNext = `import {
   RscBoundaryProvider,
-  RscDevtools,
+  RscDevtoolsNext,
+  nextAdapter,
   RscServerBoundaryMarker,
   SERVER_BOUNDARY_DATA_ATTR,
-} from "rsc-boundary";`;
+  COLORS,
+  LABEL_BASE_STYLES,
+} from "@rsc-boundary/next";`;
+
+const importSnippetStart = `import {
+  RscBoundaryProvider,
+  RscDevtoolsStart,
+  startAdapter,
+  RscServerBoundaryMarker,
+  SERVER_BOUNDARY_DATA_ATTR,
+  createRscBoundaryProvider,
+} from "@rsc-boundary/start";`;
 
 export default function DocsApiPage() {
   return (
@@ -22,15 +35,23 @@ export default function DocsApiPage() {
           API reference
         </h1>
         <p className="mt-4 text-muted">
-          The primary integration is{" "}
-          <code>RscBoundaryProvider</code>. Advanced
-          setups can mount{" "}
-          <code>RscDevtools</code> directly if needed.
+          Pick the entry point for your stack. The primary integration is{" "}
+          <code>RscBoundaryProvider</code>. Each adapter package re-exports
+          shared types and <code>RscServerBoundaryMarker</code> from{" "}
+          <code>@rsc-boundary/core</code>.
         </p>
       </div>
 
       <div className="not-prose">
-        <CodeBlock code={importSnippet} />
+        <FrameworkTabs
+          label="Import from"
+          next={
+            <CodeBlock embedded code={importSnippetNext} lang="tsx" />
+          }
+          start={
+            <CodeBlock embedded code={importSnippetStart} lang="tsx" />
+          }
+        />
       </div>
 
       <section>
@@ -41,9 +62,9 @@ export default function DocsApiPage() {
           <code className="text-lg">RscBoundaryProvider</code>
         </h2>
         <p className="mt-2 text-muted">
-          Server Component. Wrap{" "}
-          <code>children</code> once at the root (e.g.{" "}
-          <code>app/layout.tsx</code>).
+          Server Component. Wrap <code>children</code> once at the root (Next.js:{" "}
+          <code>app/layout.tsx</code>; TanStack Start:{" "}
+          <code>app/routes/__root.tsx</code>).
         </p>
 
         <div className="mt-6 overflow-x-auto rounded-xl border border-border">
@@ -52,7 +73,9 @@ export default function DocsApiPage() {
               <tr>
                 <th className="px-4 py-3 font-semibold text-foreground">Prop</th>
                 <th className="px-4 py-3 font-semibold text-foreground">Type</th>
-                <th className="px-4 py-3 font-semibold text-foreground">Description</th>
+                <th className="px-4 py-3 font-semibold text-foreground">
+                  Description
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border text-muted">
@@ -68,12 +91,38 @@ export default function DocsApiPage() {
         <h3 className="mt-8 text-lg font-semibold text-foreground">Behavior</h3>
         <ul className="mt-3 list-inside list-disc space-y-2 text-muted">
           <li>
-            <strong className="text-foreground">Development, default:</strong> children
-            + floating devtools.
+            <strong className="text-foreground">Development, default:</strong>{" "}
+            children + floating devtools.
           </li>
           <li>
             <strong className="text-foreground">Production:</strong> children only;
             devtools are not mounted (no client chunk for the tool).
+          </li>
+        </ul>
+      </section>
+
+      <section>
+        <h2
+          id="adapters"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          <code className="text-lg">nextAdapter</code> /{" "}
+          <code className="text-lg">startAdapter</code>
+        </h2>
+        <p className="mt-2 text-muted">
+          Each implements <code>FrameworkAdapter</code> from{" "}
+          <code>@rsc-boundary/core</code>: DOM root selection, framework-internal
+          filtering, and wiring for the fiber walk. You rarely import these unless
+          you are composing <code>RscDevtools</code> from core yourself.
+        </p>
+        <ul className="mt-3 list-inside list-disc space-y-2 text-muted">
+          <li>
+            <code className="text-foreground">nextAdapter</code> — exported from{" "}
+            <code>@rsc-boundary/next</code>.
+          </li>
+          <li>
+            <code className="text-foreground">startAdapter</code> — exported from{" "}
+            <code>@rsc-boundary/start</code>.
           </li>
         </ul>
       </section>
@@ -89,10 +138,10 @@ export default function DocsApiPage() {
           Server Component. Optional marker that injects{" "}
           <code>{`data-rsc-boundary-server`}</code> onto its single child element so
           devtools list the subtree as an{" "}
-          <strong className="text-foreground">explicit</strong> server region with your{" "}
-          <code>label</code>. It uses an <code>asChild</code>-style pattern — it does{" "}
-          <strong className="text-foreground">not</strong> render a wrapper element,
-          so your DOM structure is unchanged.
+          <strong className="text-foreground">explicit</strong> server region with
+          your <code>label</code>. It uses an <code>asChild</code>-style pattern — it
+          does <strong className="text-foreground">not</strong> render a wrapper
+          element, so your DOM structure is unchanged.
         </p>
         <p className="mt-3 text-muted">
           <strong className="text-foreground">Production:</strong> the marker is a
@@ -108,31 +157,78 @@ export default function DocsApiPage() {
         </p>
         <p className="mt-3 text-muted">
           Constant <code className="text-foreground">SERVER_BOUNDARY_DATA_ATTR</code>{" "}
-          is <code className="rounded bg-muted px-1 py-0.5 text-xs">data-rsc-boundary-server</code>{" "}
+          is{" "}
+          <code className="rounded bg-muted px-1 py-0.5 text-xs">
+            data-rsc-boundary-server
+          </code>{" "}
           if you need it for docs or codegen.
         </p>
       </section>
 
       <section>
         <h2
-          id="rsc-devtools"
+          id="rsc-devtools-next-start"
           className="scroll-mt-24 text-xl font-semibold text-foreground"
         >
-          <code className="text-lg">RscDevtools</code>
+          <code className="text-lg">RscDevtoolsNext</code> /{" "}
+          <code className="text-lg">RscDevtoolsStart</code>
         </h2>
         <p className="mt-2 text-muted">
-          Client Component. Renders the pill, panel, and highlighting logic. Normally you
-          do not import it; the provider includes it when appropriate. Export is
-          available for custom layouts or non-standard wiring.
+          Client Components. Each renders the shared{" "}
+          <code>RscDevtools</code> UI from core with the matching adapter
+          pre-wired (no props). Normally you do not import them —{" "}
+          <code>RscBoundaryProvider</code> mounts the right one in development.
+          They are exported for custom layouts or non-standard wiring.
         </p>
       </section>
 
-      <p className="text-muted">
-        <Link href="/docs/how-it-works" className="font-medium text-accent hover:underline">
-          How it works
-        </Link>{" "}
-        — detection pipeline and limitations.
-      </p>
+      <section>
+        <h2
+          id="create-rsc-boundary-provider"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          <code className="text-lg">createRscBoundaryProvider</code>
+        </h2>
+        <p className="mt-2 text-muted">
+          Factory from <code>@rsc-boundary/core</code>, re-exported by{" "}
+          <code>@rsc-boundary/next</code> and <code>@rsc-boundary/start</code>.
+          It takes a no-props client devtools component that closes over your
+          adapter and returns a server <code>RscBoundaryProvider</code>. The
+          published Next.js and Start packages use this internally; use it when
+          building a new framework adapter.
+        </p>
+      </section>
+
+      <section>
+        <h2
+          id="legacy-shim"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          Legacy <code className="text-lg">rsc-boundary</code> package
+        </h2>
+        <p className="mt-2 text-muted">
+          The unscoped <code>rsc-boundary</code> npm package re-exports{" "}
+          <code>@rsc-boundary/next</code> for backward compatibility. New projects
+          should depend on <code>@rsc-boundary/next</code> or{" "}
+          <code>@rsc-boundary/start</code> directly.
+        </p>
+      </section>
+
+      <section>
+        <h2
+          id="next-only-exports"
+          className="scroll-mt-24 text-xl font-semibold text-foreground"
+        >
+          Next-only: <code className="text-lg">COLORS</code>,{" "}
+          <code className="text-lg">LABEL_BASE_STYLES</code>
+        </h2>
+        <p className="mt-2 text-muted">
+          Re-exported from <code>@rsc-boundary/next</code> for building static
+          previews that match devtools styling (e.g. documentation sites). Not
+          exported from <code>@rsc-boundary/start</code>; import from{" "}
+          <code>@rsc-boundary/core</code> if you need them outside Next.
+        </p>
+      </section>
     </article>
   );
 }
