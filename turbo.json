@@ -1,5 +1,5 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
+  "$schema": "https://v2-9-6.turborepo.dev/schema.json",
   "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_GITHUB_STARS_ENABLED"],
   "tasks": {
     "build": {
