@@ -1,10 +1,11 @@
-import { createFileRoute } from "@tanstack/react-router";
 import { RscServerBoundaryMarker } from "@rsc-boundary/start";
-import { Header } from "../components/header";
+import { createFileRoute } from "@tanstack/react-router";
 import { FaqAccordion } from "../components/faq-accordion";
+import { Header } from "../components/header";
 import { faqs, teamMembers, techStack } from "../lib/data";
 
 export const Route = createFileRoute("/about")({
+  head: () => ({ meta: [{ title: "About — DevPulse" }] }),
   component: AboutPage,
 });
 
@@ -74,7 +75,9 @@ function AboutPage() {
           <RscServerBoundaryMarker label="TechStack">
             <section className="page-section">
               <h2 className="page-section-title">Built with</h2>
-              <p className="page-section-subtitle">The stack behind DevPulse.</p>
+              <p className="page-section-subtitle">
+                The stack behind DevPulse.
+              </p>
               <div className="stack-grid">
                 {techStack.map((item) => (
                   <div key={item.name} className="stack-card">
@@ -110,9 +113,11 @@ function AboutPage() {
           <div className="container footer-inner">
             <span>© 2026 DevPulse. Built to demo RSC Boundary.</span>
             <nav className="footer-links">
-              <a href="/" className="footer-link">Home</a>
+              <a href="/" className="footer-link">
+                Home
+              </a>
               <a
-                href="https://github.com/nicnocquee/rsc-boundary"
+                href="https://github.com/foxted/rsc-boundary"
                 className="footer-link"
               >
                 GitHub

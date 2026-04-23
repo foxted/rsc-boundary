@@ -38,8 +38,9 @@ export const nextAdapter: FrameworkAdapter = {
     "OutletBoundary",
     "HTTPAccessFallbackBoundary",
     "HTTPAccessErrorBoundary",
-    // RSC Boundary own devtools root (sub-components filtered via DOM check)
+    // RSC Boundary own components (not user-authored client components)
     "RscDevtools",
+    "RscServerBoundaryMarker",
   ]),
 
   rootCandidates: () => [

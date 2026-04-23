@@ -1,8 +1,8 @@
-import Link from "next/link";
 import { RscServerBoundaryMarker } from "@rsc-boundary/next";
-import { Header } from "../../components/header";
-import { FaqAccordion } from "../../components/faq-accordion";
-import { faqs, teamMembers, techStack } from "../../lib/data";
+import { FaqAccordion } from "../components/faq-accordion";
+import { Header } from "../components/header";
+import { Footer } from "../components/footer";
+import { faqs, teamMembers, techStack } from "../lib/data";
 
 export const metadata = {
   title: "About — DevPulse",
@@ -75,7 +75,9 @@ export default function AboutPage() {
           <RscServerBoundaryMarker label="TechStack">
             <section className="page-section">
               <h2 className="page-section-title">Built with</h2>
-              <p className="page-section-subtitle">The stack behind DevPulse.</p>
+              <p className="page-section-subtitle">
+                The stack behind DevPulse.
+              </p>
               <div className="stack-grid">
                 {techStack.map((item) => (
                   <div key={item.name} className="stack-card">
@@ -105,18 +107,7 @@ export default function AboutPage() {
         </div>
       </main>
 
-      {/* ── Footer (server) ───────────────────────────── */}
-      <RscServerBoundaryMarker label="Footer">
-        <footer className="site-footer">
-          <div className="container footer-inner">
-            <span>© 2026 DevPulse. Built to demo RSC Boundary.</span>
-            <nav className="footer-links">
-              <Link href="/" className="footer-link">Home</Link>
-              <a href="https://github.com/nicnocquee/rsc-boundary" className="footer-link">GitHub</a>
-            </nav>
-          </div>
-        </footer>
-      </RscServerBoundaryMarker>
+      <Footer />
     </>
   );
 }
