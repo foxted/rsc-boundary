@@ -1,5 +1,11 @@
 # @rsc-boundary/core
 
+## 0.3.1
+
+### Patch Changes
+
+- d8a73d0: Fix ERR_MODULE_NOT_FOUND when consuming the package in Node ESM environments (e.g. TanStack Start) by enabling `rewriteRelativeImportExtensions` in the TypeScript build config. This ensures relative imports in emitted output have `.js` extensions as required by Node's ESM resolver.
+
 ## 0.3.0
 
 ### Minor Changes
