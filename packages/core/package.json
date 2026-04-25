@@ -20,8 +20,8 @@
     "LICENSE"
   ],
   "scripts": {
-    "dev": "tsc -p tsconfig.build.json --watch",
-    "build": "tsc -p tsconfig.build.json",
+    "dev": "tsup --watch",
+    "build": "tsup",
     "lint": "eslint --max-warnings 0",
     "check-types": "tsc --noEmit",
     "test": "vitest run"
@@ -42,6 +42,7 @@
     "@types/react-dom": "19.2.3",
     "eslint": "^9.39.1",
     "jsdom": "^26.1.0",
+    "tsup": "^8.5.1",
     "typescript": "6.0.2",
     "vitest": "^3.2.4"
   }
