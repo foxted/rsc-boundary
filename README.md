@@ -85,11 +85,11 @@ pnpm remove rsc-boundary && pnpm add @rsc-boundary/start
 
 ## Packages
 
-| Package | Description |
-|---|---|
-| [`@rsc-boundary/core`](packages/core) | Framework-agnostic: fiber walk, highlighting engine, devtools UI, adapter contract |
-| [`@rsc-boundary/next`](packages/next) | Next.js App Router adapter + `RscBoundaryProvider` |
-| [`@rsc-boundary/start`](packages/start) | TanStack Start adapter + `RscBoundaryProvider` |
+| Package                                 | Description                                                                        |
+| --------------------------------------- | ---------------------------------------------------------------------------------- |
+| [`@rsc-boundary/core`](packages/core)   | Framework-agnostic: fiber walk, highlighting engine, devtools UI, adapter contract |
+| [`@rsc-boundary/next`](packages/next)   | Next.js App Router adapter + `RscBoundaryProvider`                                 |
+| [`@rsc-boundary/start`](packages/start) | TanStack Start adapter + `RscBoundaryProvider`                                     |
 
 For behavior details, optional APIs (`RscDevtools`, explicit server markers), architecture, and limitations, read the per-package READMEs.
 
@@ -101,8 +101,8 @@ This repo includes coding-agent skills that walk through the integration steps:
 - **TanStack Start:** [`skills/install-start`](skills/install-start)
 
 ```bash
-npx skills add foxted/boundary --skill install-next
-npx skills add foxted/boundary --skill install-start
+npx skills add foxted/rsc-boundary --skill install-next
+npx skills add foxted/rsc-boundary --skill install-start
 ```
 
 ## Contributing
