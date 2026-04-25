@@ -1,4 +1,4 @@
-import { RscServerBoundaryMarker } from "rsc-boundary";
+import { RscServerBoundaryMarker } from "@rsc-boundary/next";
 
 import { FakeClientChrome, FakeServerChrome } from "./boundary-chrome";
 import { SearchFilter } from "./search-filter";

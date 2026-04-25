@@ -2,15 +2,15 @@
 
 **See where Server Components end and Client Components begin**—directly in the browser, on your real app.
 
-RSC Boundary is a lightweight devtool for **Next.js App Router** apps. Add one provider to your root layout and you get outlines, labels, and a panel that map **server-rendered regions** vs **client subtrees**—no annotations on every file, no guessing from the file tree alone.
+RSC Boundary is a lightweight devtool for **React Server Component** apps. Add one provider to your root layout and you get outlines, labels, and a panel that map **server-rendered regions** vs **client subtrees**—no annotations on every file, no guessing from the file tree alone.
 
-The published package is [`rsc-boundary`](packages/rsc-boundary). This repo also ships a **demo, docs snippets, and playground** in [`apps/web`](apps/web).
+The published packages live under `packages/`; the **demo site and playground** live under `apps/web`. Minimal adapter smoke-tests live under `playgrounds/`.
 
 ![RSC Boundary devtools on the demo site: blue outlines for server regions, orange for client components](apps/web/public/screenshot.png)
 
 ## Why use it
 
-- **Make the RSC mental model concrete.** Server Components have no client fibers; Client Components hydrate. That split is easy to lose when you’re deep in JSX—this tool surfaces it on the page you’re building.
+- **Make the RSC mental model concrete.** Server Components have no client fibers; Client Components hydrate. That split is easy to lose when you're deep in JSX—this tool surfaces it on the page you're building.
 - **Onboard and review faster.** Spot accidental client boundaries, nested server islands, and where interactivity actually lives without spelunking through `"use client"` directives.
 - **Zero ceremony in production.** In production builds the provider is a pass-through: no extra DOM, no runtime cost. Highlights run only in development.
 
@@ -20,22 +20,22 @@ The published package is [`rsc-boundary`](packages/rsc-boundary). This repo also
 - **Blue** dashed outlines around server regions (heuristic detection, plus optional explicit markers when you need precision).
 - **Labels** and a **panel** with component names and provenance—so you can correlate the UI with your source.
 
-For behavior details, optional APIs (`RscDevtools`, explicit server markers), architecture, and limitations, read **[`packages/rsc-boundary/README.md`](packages/rsc-boundary/README.md)**.
+## Install
 
-## Install in your Next.js app
+### Next.js (App Router)
 
 **Requirements:** Next.js **16+** (App Router), React **19+**.
 
 ```bash
-pnpm add rsc-boundary
-# or: npm install rsc-boundary
-# or: yarn add rsc-boundary
+pnpm add @rsc-boundary/next
+# or: npm install @rsc-boundary/next
+# or: yarn add @rsc-boundary/next
 ```
 
-Wrap `children` in your **root** `app/layout.tsx` (or `src/app/layout.tsx`):
+Wrap `children` in your **root** `app/layout.tsx`:
 
 ```tsx
-import { RscBoundaryProvider } from "rsc-boundary";
+import { RscBoundaryProvider } from "@rsc-boundary/next";
 
 export default function RootLayout({
   children,
@@ -52,30 +52,79 @@ export default function RootLayout({
 }
 ```
 
-You do not need to change other components. A small control appears in development to toggle highlights. This repo’s docs site uses static outlined previews on the Examples page instead of running devtools in production.
+### TanStack Start
 
-### Agent skill (`install`)
-
-This repo includes a coding-agent skill that walks through the same integration steps; it lives at [`skills/install`](skills/install). Add it with **skills.sh** or:
+**Requirements:** `@tanstack/react-start` **1+**, React **19+**.
 
 ```bash
-npx skills add foxted/boundary --skill install
+pnpm add @rsc-boundary/start
 ```
 
-## Contributing to this monorepo
+Wrap `children` in your root route (`app/routes/__root.tsx`):
+
+```tsx
+import { RscBoundaryProvider } from "@rsc-boundary/start";
+```
+
+See [`packages/start/README.md`](packages/start/README.md) for the full integration guide.
+
+### Migrating from `rsc-boundary`
+
+The unscoped `rsc-boundary` package on npm is **deprecated** — it is no longer published from this monorepo. **Next.js (App Router):** install `@rsc-boundary/next` (includes `@rsc-boundary/core` as a dependency). **TanStack Start:** install `@rsc-boundary/start` (same).
+
+```bash
+pnpm remove rsc-boundary && pnpm add @rsc-boundary/next
+# or, for Start:
+pnpm remove rsc-boundary && pnpm add @rsc-boundary/start
+```
+
+```diff
+-import { RscBoundaryProvider } from "rsc-boundary";
++import { RscBoundaryProvider } from "@rsc-boundary/next";
+```
+
+## Packages
+
+| Package | Description |
+|---|---|
+| [`@rsc-boundary/core`](packages/core) | Framework-agnostic: fiber walk, highlighting engine, devtools UI, adapter contract |
+| [`@rsc-boundary/next`](packages/next) | Next.js App Router adapter + `RscBoundaryProvider` |
+| [`@rsc-boundary/start`](packages/start) | TanStack Start adapter + `RscBoundaryProvider` |
+
+For behavior details, optional APIs (`RscDevtools`, explicit server markers), architecture, and limitations, read the per-package READMEs.
+
+## Agent skill (`install`)
+
+This repo includes coding-agent skills that walk through the integration steps:
+
+- **Next.js:** [`skills/install-next`](skills/install-next)
+- **TanStack Start:** [`skills/install-start`](skills/install-start)
+
+```bash
+npx skills add foxted/boundary --skill install-next
+npx skills add foxted/boundary --skill install-start
+```
+
+## Contributing
 
 Layout, local dev, and where to put changes: **[`CONTRIBUTING.md`](CONTRIBUTING.md)** and [`AGENTS.md`](AGENTS.md).
 
 ## Releases
 
-Versioning and publishing use [Changesets](https://github.com/changesets/changesets). From the repo root:
+Versioning and publishing use [Changesets](https://github.com/changesets/changesets). The three publishable packages are versioned together (same version at every release). From the repo root:
 
 ```bash
 pnpm changeset        # describe changes
 pnpm version-packages # bump versions from changesets
-pnpm release          # build package and publish (maintainers)
+pnpm release          # build packages and publish (maintainers)
+```
+
+**Maintainers:** after the scoped packages are on npm, deprecate the legacy unscoped package so installs show a migration hint:
+
+```bash
+npm deprecate rsc-boundary@"*" "rsc-boundary has moved. Install @rsc-boundary/next (Next.js) or @rsc-boundary/start (TanStack Start) instead - @rsc-boundary/core is pulled in automatically."
 ```
 
 ## License
 
-See [LICENSE](LICENSE). The `rsc-boundary` package includes its own [LICENSE](packages/rsc-boundary/LICENSE).
+See [LICENSE](LICENSE). Each package includes its own LICENSE file.

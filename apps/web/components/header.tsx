@@ -35,6 +35,12 @@ export function Header() {
           >
             API
           </Link>
+          <Link
+            href="/docs/how-it-works"
+            className="text-sm font-medium text-muted transition hover:text-foreground"
+          >
+            How it works
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <GitHubRepoLink location="header" />

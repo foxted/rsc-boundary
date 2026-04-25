@@ -1,0 +1,14 @@
+{
+  "extends": "@repo/typescript-config/react-library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "paths": {
+      "~/*": ["./app/*"]
+    }
+  },
+  "include": ["app"],
+  "exclude": ["node_modules", "app.config.ts"]
+}

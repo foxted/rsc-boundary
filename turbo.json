@@ -1,11 +1,11 @@
 {
-  "$schema": "https://turborepo.dev/schema.json",
+  "$schema": "https://v2-9-6.turborepo.dev/schema.json",
   "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_GITHUB_STARS_ENABLED"],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"]
+      "outputs": [".next/**", "!.next/cache/**", ".vinxi/**", ".output/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]

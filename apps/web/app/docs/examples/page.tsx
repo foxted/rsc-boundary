@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { CodeBlock } from "../../../components/code-block";
+import { FrameworkTabs } from "../../../components/framework-tabs";
 import { ServerAccordionDemo } from "../../../components/examples/server-accordion-demo";
 import { ServerCounterDemo } from "../../../components/examples/server-counter-demo";
 import { ServerHybridDemo } from "../../../components/examples/server-hybrid-demo";
@@ -12,10 +13,13 @@ export const metadata: Metadata = {
     "Interactive examples mixing Server and Client Components for RSC Boundary.",
 };
 
-const staticBlockSnippet = `// components/examples/server-static-block.tsx
-import { RscServerBoundaryMarker } from "rsc-boundary";
+type Pkg = "@rsc-boundary/next" | "@rsc-boundary/start";
 
-export function ServerStaticBlock() {
+function withMarkerImport(fileComment: string, pkg: Pkg, body: string): string {
+  return `${fileComment}\nimport { RscServerBoundaryMarker } from "${pkg}";\n\n${body}`;
+}
+
+const staticBlockBody = `export function ServerStaticBlock() {
   return (
     <RscServerBoundaryMarker label="ExampleServerOnly">
       <div className="rounded-xl border ...">{/* server-only content */}</div>
@@ -23,9 +27,18 @@ export function ServerStaticBlock() {
   );
 }`;
 
-const serverCounterSnippet = `// components/examples/server-counter-demo.tsx
-import { RscServerBoundaryMarker } from "rsc-boundary";
-import { Counter } from "./counter";
+const staticBlockSnippetNext = withMarkerImport(
+  "// components/examples/server-static-block.tsx",
+  "@rsc-boundary/next",
+  staticBlockBody,
+);
+const staticBlockSnippetStart = withMarkerImport(
+  "// components/examples/server-static-block.tsx",
+  "@rsc-boundary/start",
+  staticBlockBody,
+);
+
+const counterBody = `import { Counter } from "./counter";
 
 export function ServerCounterDemo() {
   return (
@@ -38,9 +51,18 @@ export function ServerCounterDemo() {
   );
 }`;
 
-const serverAccordionSnippet = `// components/examples/server-accordion-demo.tsx
-import { RscServerBoundaryMarker } from "rsc-boundary";
-import { Accordion } from "./accordion";
+const serverCounterSnippetNext = withMarkerImport(
+  "// components/examples/server-counter-demo.tsx",
+  "@rsc-boundary/next",
+  counterBody,
+);
+const serverCounterSnippetStart = withMarkerImport(
+  "// components/examples/server-counter-demo.tsx",
+  "@rsc-boundary/start",
+  counterBody,
+);
+
+const accordionBody = `import { Accordion } from "./accordion";
 
 const FAQ_ITEMS = [/* ... */];
 
@@ -55,9 +77,18 @@ export function ServerAccordionDemo() {
   );
 }`;
 
-const serverSearchSnippet = `// components/examples/server-search-demo.tsx
-import { RscServerBoundaryMarker } from "rsc-boundary";
-import { SearchFilter } from "./search-filter";
+const serverAccordionSnippetNext = withMarkerImport(
+  "// components/examples/server-accordion-demo.tsx",
+  "@rsc-boundary/next",
+  accordionBody,
+);
+const serverAccordionSnippetStart = withMarkerImport(
+  "// components/examples/server-accordion-demo.tsx",
+  "@rsc-boundary/start",
+  accordionBody,
+);
+
+const searchBody = `import { SearchFilter } from "./search-filter";
 
 const SERVER_RENDERED_ITEMS = [/* ... */] as const;
 
@@ -72,9 +103,18 @@ export function ServerSearchDemo() {
   );
 }`;
 
-const hybridSnippet = `// components/examples/server-hybrid-demo.tsx
-import { RscServerBoundaryMarker } from "rsc-boundary";
-import { Counter } from "./counter";
+const serverSearchSnippetNext = withMarkerImport(
+  "// components/examples/server-search-demo.tsx",
+  "@rsc-boundary/next",
+  searchBody,
+);
+const serverSearchSnippetStart = withMarkerImport(
+  "// components/examples/server-search-demo.tsx",
+  "@rsc-boundary/start",
+  searchBody,
+);
+
+const hybridBody = `import { Counter } from "./counter";
 
 export function ServerHybridDemo() {
   return (
@@ -87,6 +127,17 @@ export function ServerHybridDemo() {
     </div>
   );
 }`;
+
+const hybridSnippetNext = withMarkerImport(
+  "// components/examples/server-hybrid-demo.tsx",
+  "@rsc-boundary/next",
+  hybridBody,
+);
+const hybridSnippetStart = withMarkerImport(
+  "// components/examples/server-hybrid-demo.tsx",
+  "@rsc-boundary/start",
+  hybridBody,
+);
 
 export default function DocsExamplesPage() {
   return (
@@ -109,9 +160,8 @@ export default function DocsExamplesPage() {
           <code className="rounded bg-muted px-1 py-0.5 text-xs">
             RscBoundaryProvider
           </code>{" "}
-          to your app and run{" "}
-          <code className="rounded bg-muted px-1 py-0.5 text-xs">next dev</code>{" "}
-          for the interactive pill, panel, and live highlights.
+          to your app and run your dev server for the interactive pill, panel, and
+          live highlights.
         </p>
       </div>
 
@@ -131,10 +181,25 @@ export default function DocsExamplesPage() {
           so development devtools can pick up the same label.
         </p>
         <ServerStaticBlock illustrativeBoundaryChrome />
-        <CodeBlock
-          code={staticBlockSnippet}
-          filename="components/examples/server-static-block.tsx"
-        />
+        <div className="not-prose">
+          <FrameworkTabs
+            label="Import package"
+            next={
+              <CodeBlock
+                embedded
+                code={staticBlockSnippetNext}
+                filename="components/examples/server-static-block.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={staticBlockSnippetStart}
+                filename="components/examples/server-static-block.tsx"
+              />
+            }
+          />
+        </div>
       </section>
 
       <section className="space-y-4">
@@ -150,10 +215,25 @@ export default function DocsExamplesPage() {
           <code className="mx-1 rounded bg-muted px-1 py-0.5 text-xs">Counter</code>.
         </p>
         <ServerCounterDemo illustrativeBoundaryChrome />
-        <CodeBlock
-          code={serverCounterSnippet}
-          filename="components/examples/server-counter-demo.tsx"
-        />
+        <div className="not-prose">
+          <FrameworkTabs
+            label="Import package"
+            next={
+              <CodeBlock
+                embedded
+                code={serverCounterSnippetNext}
+                filename="components/examples/server-counter-demo.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={serverCounterSnippetStart}
+                filename="components/examples/server-counter-demo.tsx"
+              />
+            }
+          />
+        </div>
       </section>
 
       <section className="space-y-4">
@@ -165,10 +245,25 @@ export default function DocsExamplesPage() {
           client-side for open/close state.
         </p>
         <ServerAccordionDemo illustrativeBoundaryChrome />
-        <CodeBlock
-          code={serverAccordionSnippet}
-          filename="components/examples/server-accordion-demo.tsx"
-        />
+        <div className="not-prose">
+          <FrameworkTabs
+            label="Import package"
+            next={
+              <CodeBlock
+                embedded
+                code={serverAccordionSnippetNext}
+                filename="components/examples/server-accordion-demo.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={serverAccordionSnippetStart}
+                filename="components/examples/server-accordion-demo.tsx"
+              />
+            }
+          />
+        </div>
       </section>
 
       <section className="space-y-4">
@@ -183,10 +278,25 @@ export default function DocsExamplesPage() {
           client without a round trip.
         </p>
         <ServerSearchDemo illustrativeBoundaryChrome />
-        <CodeBlock
-          code={serverSearchSnippet}
-          filename="components/examples/server-search-demo.tsx"
-        />
+        <div className="not-prose">
+          <FrameworkTabs
+            label="Import package"
+            next={
+              <CodeBlock
+                embedded
+                code={serverSearchSnippetNext}
+                filename="components/examples/server-search-demo.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={serverSearchSnippetStart}
+                filename="components/examples/server-search-demo.tsx"
+              />
+            }
+          />
+        </div>
       </section>
 
       <section className="space-y-4">
@@ -202,10 +312,25 @@ export default function DocsExamplesPage() {
           region. Below, the static outlines show both styles side by side.
         </p>
         <ServerHybridDemo illustrativeBoundaryChrome />
-        <CodeBlock
-          code={hybridSnippet}
-          filename="components/examples/server-hybrid-demo.tsx"
-        />
+        <div className="not-prose">
+          <FrameworkTabs
+            label="Import package"
+            next={
+              <CodeBlock
+                embedded
+                code={hybridSnippetNext}
+                filename="components/examples/server-hybrid-demo.tsx"
+              />
+            }
+            start={
+              <CodeBlock
+                embedded
+                code={hybridSnippetStart}
+                filename="components/examples/server-hybrid-demo.tsx"
+              />
+            }
+          />
+        </div>
       </section>
     </article>
   );

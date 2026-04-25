@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · RSC Boundary",
   },
   description:
-    "Visualize React Server Component boundaries in Next.js (App Router).",
+    "Visualize React Server Component boundaries in Next.js (App Router) and TanStack Start.",
 };
 
 export default function RootLayout({
