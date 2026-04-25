@@ -1,5 +1,11 @@
 # @rsc-boundary/core
 
+## 0.3.0
+
+### Minor Changes
+
+- ce5f31a: Initial release of the scoped packages. Migrate from `rsc-boundary` to the framework adapter that matches your stack: `@rsc-boundary/next` (Next.js) or `@rsc-boundary/start` (TanStack Start). Each adapter pulls in `@rsc-boundary/core` transitively — no separate install needed.
+
 ## 1.0.0
 
 ### Minor Changes
