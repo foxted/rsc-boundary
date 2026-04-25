@@ -1,5 +1,12 @@
 # @rsc-boundary/start
 
+## 0.3.1
+
+### Patch Changes
+
+- Updated dependencies [d8a73d0]
+  - @rsc-boundary/core@0.3.1
+
 ## 0.3.0
 
 ### Minor Changes
