@@ -3,3 +3,7 @@ packages:
   - "packages/*"
   - "playgrounds/*"
   - "config/*"
+
+allowBuilds:
+  esbuild: true
+  sharp: true
