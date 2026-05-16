@@ -4,5 +4,6 @@ packages:
   - "playgrounds/*"
   - "config/*"
 
-onlyBuiltDependencies:
-  - "esbuild"
+allowBuilds:
+  esbuild: true
+  sharp: true
