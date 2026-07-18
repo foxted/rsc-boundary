@@ -60,3 +60,11 @@ Run a single workspace with `pnpm --filter <name> <script>` (e.g. `pnpm --filter
 ## Out of scope (unless explicitly requested)
 
 Rewriting the whole monorepo, changing Next/React majors without a tracked task, or adding heavy dependencies to the library without a clear need.
+
+## Cursor Cloud specific instructions
+
+Dependencies are refreshed on startup via `pnpm install`. Node 22 and `pnpm` are preinstalled. Standard commands are in "Commands (repo root)" above; nothing extra is needed to lint/type-check/test/build.
+
+- **The interactive boundary overlay is dev-only.** `apps/web` (port 3000, `pnpm --filter web dev`) is the marketing/docs site; its Examples page shows static previews, not the live tool. To exercise the actual product feature, run a playground that mounts `RscBoundaryProvider` in dev mode: `pnpm --filter next-playground dev` (port **3001**) or `pnpm --filter start-playground dev` (Vite, defaults to **3000**). Then click the **"RSC" pill** in the page's bottom-left corner to toggle blue "Server" / orange "CLIENT" boundary labels.
+- **Port collisions:** `web` and `start-playground` both default to 3000. Run them separately or pass a different port to one (`next-playground` is already on 3001).
+- Packages (`core`/`next`/`start`) are libraries with no dev server; their `dev` is `tsup --watch`. Turbo builds them first automatically via `^build`, so running an app's dev/build picks up package changes.
