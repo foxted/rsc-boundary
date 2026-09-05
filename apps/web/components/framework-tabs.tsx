@@ -1,5 +1,6 @@
 "use client";
 
+import posthog from "posthog-js";
 import {
   useCallback,
   useEffect,
@@ -44,6 +45,7 @@ export function FrameworkTabs({
     window.dispatchEvent(
       new CustomEvent<FrameworkTabId>(FRAMEWORK_CHANGE_EVENT, { detail: id }),
     );
+    posthog.capture("framework_selected", { framework: id });
   }, []);
 
   useEffect(() => {

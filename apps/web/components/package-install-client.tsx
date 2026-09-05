@@ -14,6 +14,7 @@ interface ThemedHtml {
 interface PackageInstallClientProps {
   commands: Record<Manager, string>;
   html: Record<Manager, ThemedHtml>;
+  packageName: string;
   /** When true, omit outer border and radius (e.g. inside FrameworkTabs). */
   embedded?: boolean;
 }
@@ -28,6 +29,7 @@ const TABS: { id: Manager; label: string }[] = [
 export function PackageInstallClient({
   commands,
   html,
+  packageName,
   embedded = false,
 }: PackageInstallClientProps) {
   const [manager, setManager] = useState<Manager>("pnpm");
@@ -67,6 +69,11 @@ export function PackageInstallClient({
         </div>
         <CopyButton
           text={commands[manager]}
+          event="install_command_copied"
+          eventProperties={{
+            package_manager: manager,
+            package_name: packageName,
+          }}
           className="shrink-0 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-muted transition hover:bg-border/40 hover:text-foreground"
         />
       </div>

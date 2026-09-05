@@ -1,5 +1,6 @@
-import { Github } from "lucide-react";
-import Link from "next/link";
+import { after } from "next/server";
+import { GitHubRepoLinkClient } from "./github-repo-link-client";
+import { getPostHogServer } from "../lib/posthog-server";
 
 const GITHUB_REPO_URL = "https://github.com/foxted/rsc-boundary";
 const GITHUB_REPO_API_URL = "https://api.github.com/repos/foxted/rsc-boundary";
@@ -44,7 +45,11 @@ async function getGitHubStarsCount(showStars: boolean) {
     }
 
     return data.stargazers_count;
-  } catch {
+  } catch (error) {
+    after(() => {
+      const posthog = getPostHogServer();
+      posthog?.captureException(error);
+    });
     return 0;
   }
 }
@@ -55,11 +60,9 @@ export async function GitHubRepoLink({ location }: GitHubRepoLinkProps) {
   const isHeader = location === "header";
 
   return (
-    <Link
+    <GitHubRepoLinkClient
       href={GITHUB_REPO_URL}
-      target="_blank"
-      rel="noreferrer"
-      aria-label="GitHub repository"
+      location={location}
       className={
         isHeader
           ? `inline-flex h-8 items-center justify-center rounded-md text-muted transition hover:text-foreground ${
@@ -70,7 +73,6 @@ export async function GitHubRepoLink({ location }: GitHubRepoLinkProps) {
             }`
       }
     >
-      <Github aria-hidden className="h-4 w-4" />
       {showGitHubStars ? (
         <span
           className={
@@ -82,7 +84,6 @@ export async function GitHubRepoLink({ location }: GitHubRepoLinkProps) {
           {starsCount}
         </span>
       ) : null}
-      <span className="sr-only">GitHub repository</span>
-    </Link>
+    </GitHubRepoLinkClient>
   );
 }

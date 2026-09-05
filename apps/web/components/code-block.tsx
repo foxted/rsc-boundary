@@ -40,6 +40,7 @@ export async function CodeBlock({
         </span>
         <CopyButton
           text={trimmed}
+          eventProperties={filename ? { filename } : undefined}
           className="shrink-0 rounded-md border border-border bg-card px-2 py-1 text-xs font-medium text-muted transition hover:bg-border/40 hover:text-foreground"
         />
       </div>

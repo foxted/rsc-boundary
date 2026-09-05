@@ -28,6 +28,7 @@ export async function PackageInstall({
   return (
     <PackageInstallClient
       commands={commands}
+      packageName={packageName}
       embedded={embedded}
       html={{
         pnpm,

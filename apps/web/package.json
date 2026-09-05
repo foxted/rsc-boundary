@@ -11,12 +11,14 @@
     "check-types": "next typegen && tsc --noEmit"
   },
   "dependencies": {
+    "@rsc-boundary/next": "workspace:*",
     "@vercel/analytics": "^2.0.1",
     "lucide-react": "^0.577.0",
     "next": "16.2.6",
+    "posthog-js": "^1.427.2",
+    "posthog-node": "^5.51.6",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
-    "@rsc-boundary/next": "workspace:*",
     "shiki": "^4.0.2"
   },
   "devDependencies": {

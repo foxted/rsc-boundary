@@ -1,6 +1,12 @@
 {
   "$schema": "https://v2-9-6.turborepo.dev/schema.json",
-  "globalEnv": ["NODE_ENV", "NEXT_PUBLIC_GITHUB_STARS_ENABLED"],
+  "globalEnv": [
+    "NODE_ENV",
+    "NEXT_PUBLIC_GITHUB_STARS_ENABLED",
+    "NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN",
+    "NEXT_PUBLIC_POSTHOG_HOST",
+    "NEXT_RUNTIME"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
